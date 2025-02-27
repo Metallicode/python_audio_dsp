@@ -1,0 +1,25 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+__init__.cpython-38.pyc
+
+# Ignore WAV and other audio files
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.aiff
+*.aif
+*.m4a
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+.DS_Store  # macOS system file
+Thumbs.db  # Windows system file
+
+# Ignore virtual environments
+venv/
+.env/
+*.env
