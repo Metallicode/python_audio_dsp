@@ -4,11 +4,13 @@ from audio_dsp.synth.subtractive_synth import SubtractiveSynth
 
 s = SubtractiveSynth()
 s.osc_wave = "saw"
-s.filter_cutoff = 1500  # High cutoff to prevent muting
-s.filter_resonance =6
-s.lfo_freq = 0.01
-s.filter_q = 4.0
-s.lfo_depth = 0.9
+s.filter_cutoff = 3000  # High cutoff to prevent muting
+s.filter_resonance = 5
+s.lfo_freq = 0.04
+s.filter_q = 5.0
+s.lfo_depth = 0.7
+#s.filter_type = "bandpass"
+#s.filter_type = "highpass"
 
 s.lfo_target = "filter"
 wave = s.synthesize(freq=60, duration=50.0, attack=0.02, decay=0.1, sustain=0.6, release=0.3)

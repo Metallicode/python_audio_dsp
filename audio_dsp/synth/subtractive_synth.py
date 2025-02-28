@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.signal import butter, lfilter
+import soundfile as sf
 
 class SubtractiveSynth:
     def __init__(self, sample_rate=44100):
@@ -12,10 +12,10 @@ class SubtractiveSynth:
         self.release = 0.2
         
         # Default Filter Parameters
-        self.filter_type = "lowpass"
+        self.filter_type = "lowpass"  # 'lowpass', 'highpass', 'bandpass'
         self.filter_cutoff = 1000  # Hz
         self.filter_resonance = 0.7  # Resonance amplitude (0–5)
-        self.filter_q = 1.0  # Q factor (0.1–10, width of resonance peak)
+        self.filter_q = 1.0  # Q factor (0.1–10)
 
         # Default LFOs
         self.lfo_freq = 5
@@ -66,42 +66,60 @@ class SubtractiveSynth:
         envelope[sustain_end:] = np.linspace(sustain_level, 0, release_samples)
         return signal * envelope
 
-    def apply_filter(self, signal, cutoff, resonance, q):
+    def apply_filter(self, signal, cutoff, resonance, q, filter_type="lowpass"):
         """
-        Enhanced 4-pole resonant low-pass filter with adjustable Q (width).
-        Parameters:
+        Enhanced 4-pole resonant filter with adjustable Q and type.
         - signal: Input audio array
         - cutoff: Array of cutoff frequencies in Hz (50–5000)
         - resonance: Resonance amplitude (0–5)
-        - q: Q factor (0.1–10, lower = wider peak)
+        - q: Q factor (0.1–10)
+        - filter_type: 'lowpass', 'highpass', 'bandpass'
         """
         nyquist = self.sample_rate / 2
         cutoff = np.clip(cutoff, 50, nyquist - 1)
         resonance = np.clip(resonance, 0, 5.0)
-        q = np.clip(q, 0.1, 10.0)  # Q range for width control
+        q = np.clip(q, 0.1, 10.0)
         
-        # Resonance amplitude scaling
-        res_amplitude = resonance * 0.25 * (1 + np.exp(0.5 * resonance))  # 0 to ~20
-        
-        # Filter state
+        res_amplitude = resonance * 0.25 * (1 + np.exp(0.5 * resonance))
         y0, y1, y2, y3 = 0.0, 0.0, 0.0, 0.0
         output = np.zeros_like(signal)
         
         for i in range(len(signal)):
             wc = 2 * np.pi * cutoff[i] / self.sample_rate
-            alpha = np.sin(wc) / q  # Q adjusts bandwidth (lower Q = wider)
-            input_sample = signal[i] - res_amplitude * y3
+            alpha = np.sin(wc) / q
+            input_sample = signal[i]
             
-            # 4-stage ladder with saturation
-            y0 = np.tanh(y0 + alpha * (input_sample - y0))
-            y1 = np.tanh(y1 + alpha * (y0 - y1))
-            y2 = np.tanh(y2 + alpha * (y1 - y2))
-            y3 = np.tanh(y3 + alpha * (y2 - y3))
+            if filter_type == "lowpass":
+                feedback = res_amplitude * y3
+                y0 = np.tanh(y0 + alpha * (input_sample - feedback - y0))
+                y1 = np.tanh(y1 + alpha * (y0 - y1))
+                y2 = np.tanh(y2 + alpha * (y1 - y2))
+                y3 = np.tanh(y3 + alpha * (y2 - y3))
+                y3 *= 0.98
+                output[i] = y3
             
-            y3 *= 0.98  # Stability damping
-            output[i] = y3
+            elif filter_type == "highpass":
+                # High-pass: Differential ladder
+                feedback = res_amplitude * y3
+                diff = input_sample - y0  # Differentiate input
+                y0 = np.tanh(diff + alpha * (input_sample - y0 - feedback))
+                y1 = np.tanh(y1 + alpha * (y0 - y1))
+                y2 = np.tanh(y2 + alpha * (y1 - y2))
+                y3 = np.tanh(y3 + alpha * (y2 - y3))
+                y3 *= 0.98
+                output[i] = y0 * 2.0  # Boost highs
+            
+            elif filter_type == "bandpass":
+                feedback = res_amplitude * y3
+                y0 = np.tanh(y0 + alpha * (input_sample - feedback - y0))
+                y1 = np.tanh(y1 + alpha * (y0 - y1))
+                y2 = np.tanh(y2 + alpha * (y1 - y2))
+                y3 = np.tanh(y3 + alpha * (y2 - y3))
+                y3 *= 0.98
+                output[i] = y2 - y3
         
-        output = np.tanh(output * 1.5)  # Harsh clipping
+        print(f"{filter_type} filter output range: {np.min(output):.5f} to {np.max(output):.5f}")
+        output = np.tanh(output)  # Final clip
         return output
 
     def synthesize(self, freq, duration, attack=None, decay=None, sustain=None, release=None):
@@ -118,7 +136,8 @@ class SubtractiveSynth:
         if self.lfo_target == "filter":
             cutoff_modulated = self.filter_cutoff * (1 + lfo)
             cutoff_modulated = np.clip(cutoff_modulated, 20, self.sample_rate / 2)
-            signal = self.apply_filter(signal, cutoff_modulated, self.filter_resonance, self.filter_q)
+            signal = self.apply_filter(signal, cutoff_modulated, self.filter_resonance, 
+                                     self.filter_q, self.filter_type)
         elif self.lfo_target == "pitch":
             freq_modulated = freq * (1 + lfo)
             signal = np.interp(t, t, self.generate_waveform(self.osc_wave, freq_modulated, duration))
@@ -127,3 +146,24 @@ class SubtractiveSynth:
 
         signal = self.apply_adsr(signal, attack, decay, sustain, release)
         return signal
+
+# Test it
+if __name__ == "__main__":
+    s = SubtractiveSynth(sample_rate=44100)
+    
+    # Low-pass
+    wave_lp = s.synthesize(freq=70, duration=4.0, attack=0.02, decay=0.1, sustain=0.6, release=0.3)
+    sf.write("tb303_lp.wav", wave_lp, 44100, subtype='PCM_16')
+    print("Saved low-pass to tb303_lp.wav")
+    
+    # High-pass
+    s.filter_type = "highpass"
+    wave_hp = s.synthesize(freq=70, duration=4.0, attack=0.02, decay=0.1, sustain=0.6, release=0.3)
+    sf.write("tb303_hp.wav", wave_hp, 44100, subtype='PCM_16')
+    print("Saved high-pass to tb303_hp.wav")
+    
+    # Bandpass
+    s.filter_type = "bandpass"
+    wave_bp = s.synthesize(freq=70, duration=4.0, attack=0.02, decay=0.1, sustain=0.6, release=0.3)
+    sf.write("tb303_bp.wav", wave_bp, 44100, subtype='PCM_16')
+    print("Saved bandpass to tb303_bp.wav")
