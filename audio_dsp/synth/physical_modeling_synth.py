@@ -6,14 +6,15 @@ class PhysicalModelingSynth:
     def __init__(self, sample_rate=44100):
         self.sample_rate = sample_rate
 
-    def synthesize(self, frequency, length, transient_file, spectral_file, output_file):
+    def synthesize(self, frequency, length, transient_file, spectral_file, output_file, decay_rate=0.5):
         """
-        Synthesize sound with crossfaded transient and spectral body.
+        Synthesize sound by exciting spectral body with transient.
         - frequency: Target frequency in Hz
         - length: Desired duration in seconds
         - transient_file: .transient file path
         - spectral_file: .spectral file path
         - output_file: Output WAV file path
+        - decay_rate: Body decay speed (seconds, default 0.5)
         """
         # Load transient
         with open(transient_file, 'r') as f:
@@ -23,9 +24,9 @@ class PhysicalModelingSynth:
         transient = transient / np.max(np.abs(transient))  # Normalize to 1.0
         print(f"Transient loaded: {transient_len} samples ({transient_len/self.sample_rate:.3f}s), max amp: {np.max(np.abs(transient)):.5f}")
         
-        # Save transient for debugging
-        sf.write("transient_debug.wav", transient, self.sample_rate, subtype='PCM_16')
-        print("Saved transient_debug.wav")
+        # # Save transient for debugging
+        # sf.write("transient_debug.wav", transient, self.sample_rate, subtype='PCM_16')
+        # print("Saved transient_debug.wav")
         
         # Load spectral data
         with open(spectral_file, 'r') as f:
@@ -45,38 +46,34 @@ class PhysicalModelingSynth:
             phase = peak["phase"]
             body += amp * np.sin(2 * np.pi * freq * t + phase)
         body = body / (len(peaks) * 10)  # Scale down
-        body = body / np.max(np.abs(body))  # Normalize to 1.0
-        print(f"Body max amp: {np.max(np.abs(body)):.5f}")
+        print(f"Body max amp pre-envelope: {np.max(np.abs(body)):.5f}")
         
-        # Crossfade envelopes
-        transient_env = np.ones(total_samples)
-        body_env = np.ones(total_samples)
-        if transient_len < total_samples:
-            # Transient fades out over its length
-            transient_env[:transient_len] = np.linspace(1, 0, transient_len)
-            transient_env[transient_len:] = 0
-            # Body fades in over transient length
-            body_env[:transient_len] = np.linspace(0, 1, transient_len)
-        else:
-            # If transient is longer, truncate and adjust
-            transient_env = np.linspace(1, 0, total_samples)
-            body_env = np.linspace(0, 1, total_samples)
-        print(f"Crossfade set over {min(transient_len, total_samples)} samples")
-        
-        # Apply envelopes
-        transient_signal = np.zeros(total_samples)
+        # Envelope driven by transient
+        excitation_env = np.zeros(total_samples)
         if transient_len <= total_samples:
-            transient_signal[:transient_len] = transient
+            excitation_env[:transient_len] = np.abs(transient)  # Use transient energy
         else:
-            transient_signal = transient[:total_samples]
-        transient_signal *= transient_env
-        print(f"Transient signal max amp: {np.max(np.abs(transient_signal)):.5f}")
+            excitation_env = np.abs(transient[:total_samples])
         
-        body_signal = body * body_env
-        print(f"Body signal max amp: {np.max(np.abs(body_signal)):.5f}")
+        # Decay envelope for body (exponential fade after transient)
+        decay_samples = int(decay_rate * self.sample_rate)
+        if transient_len + decay_samples < total_samples:
+            decay_env = np.ones(total_samples)
+            decay_env[transient_len:transient_len + decay_samples] = np.exp(-np.linspace(0, 5, decay_samples))  # Fast decay
+            decay_env[transient_len + decay_samples:] = decay_env[transient_len + decay_samples - 1]  # Sustain tail
+        else:
+            decay_env = np.exp(-5 * t / length)  # Full exponential if transient dominates
+        body_env = excitation_env + decay_env  # Combine excitation + decay
+        body_env = body_env / np.max(body_env)  # Normalize envelope to 1.0
+        body *= body_env
+        print(f"Body max amp after envelope: {np.max(np.abs(body)):.5f}")
         
-        # Combine
-        output = transient_signal + body_signal
+        # Output with transient infusion
+        output = body
+        if transient_len <= total_samples:
+            output[:transient_len] += transient  # Add transient directly
+        else:
+            output += transient[:total_samples]
         print(f"Output max amp pre-normalize: {np.max(np.abs(output)):.5f}")
         
         # Normalize
@@ -90,5 +87,5 @@ class PhysicalModelingSynth:
 # Test it
 if __name__ == "__main__":
     synth = PhysicalModelingSynth()
-    synth.synthesize(frequency=310, length=2.0, transient_file="input.transient", 
-                     spectral_file="input.spectral", output_file="pm_synth.wav")
+    synth.synthesize(frequency=510, length=2.0, transient_file="input.transient", 
+                     spectral_file="input.spectral", output_file="pm_synth.wav", decay_rate=0.5)
