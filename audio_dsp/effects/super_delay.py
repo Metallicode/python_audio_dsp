@@ -1,14 +1,48 @@
 import numpy as np
-import soundfile as sf
-import librosa
 from scipy.io import wavfile
+from scipy import interpolate  # Added missing import
+import librosa
 
 class SuperDelay:
     def __init__(self, sample_rate=44100):
         self.sample_rate = sample_rate
 
-    def _lowpass_filter(self, signal, cutoff):
-        """Applies a smooth low-pass filter using FFT."""
+    def pitch_drift(self, input_signal, drift_depth=0.1, drift_rate=0.05):
+        """Apply a slow, random pitch drift to an input signal efficiently."""
+        signal = np.array(input_signal, dtype=np.float64)
+        signal = signal / np.max(np.abs(signal)) if np.max(np.abs(signal)) > 0 else signal
+        total_samples = len(signal)
+        t = np.linspace(0, total_samples / self.sample_rate, total_samples, endpoint=False)
+        lfo = np.random.normal(0, 1, total_samples)
+        lfo = np.convolve(lfo, np.ones(500)/500, mode='same')
+        pitch_shift = drift_depth * np.sin(2 * np.pi * drift_rate * t + lfo)
+        speed = 2 ** (pitch_shift / 12.0)
+        warped_time = np.cumsum(1.0 / speed)
+        warped_time = warped_time * (total_samples / warped_time[-1])
+        interp_func = interpolate.interp1d(np.arange(total_samples), signal, kind='linear', 
+                                           bounds_error=False, fill_value=0)
+        output = interp_func(warped_time)
+        return output / np.max(np.abs(output))
+
+    def flutter_effect(self, input_signal, base_rate=5.0, rate_diff=1.0, depth=0.05):
+        """Apply a flutter effect with dual-sine LFO modulation."""
+        signal = np.array(input_signal, dtype=np.float64)
+        signal = signal / np.max(np.abs(signal)) if np.max(np.abs(signal)) > 0 else signal
+        total_samples = len(signal)
+        t = np.linspace(0, total_samples / self.sample_rate, total_samples, endpoint=False)
+        lfo1 = np.sin(2 * np.pi * base_rate * t)
+        lfo2 = np.sin(2 * np.pi * (base_rate + rate_diff) * t)
+        lfo = (lfo1 + lfo2) / 2.0
+        speed = 1.0 + (depth * lfo)
+        warped_time = np.cumsum(1.0 / speed)
+        warped_time = warped_time * (total_samples / warped_time[-1])
+        interp_func = interpolate.interp1d(np.arange(total_samples), signal, kind='linear', 
+                                           bounds_error=False, fill_value=0)
+        output = interp_func(warped_time)
+        return output / np.max(np.abs(output))
+
+    def _lowpass_filter(self, signal, cutoff=3000):
+        """Apply FFT-based low-pass filter."""
         freqs = np.fft.fftfreq(len(signal), 1/self.sample_rate)
         fft = np.fft.fft(signal)
         taper = np.exp(-((np.abs(freqs) - cutoff) / (cutoff * 0.5))**2)
@@ -16,85 +50,65 @@ class SuperDelay:
         fft[np.abs(freqs) > cutoff * 1.5] = 0
         return np.real(np.fft.ifft(fft))
 
-    def _soft_clip(self, signal, gain=1.0):
-        """Applies soft-clipping for analog saturation effect."""
-        return np.tanh(signal * gain + 0.05 * signal**3) / gain
+    def _tape_saturation(self, signal, drive=2.0, warmth=0.1):
+        driven_signal = signal * drive
+        saturated = np.tanh(driven_signal) + warmth * (driven_signal ** 3)
+        return 0.5 * signal + 0.5 * saturated
 
-    def _smooth_lfo(self, length, rate, depth):
-        """Generate a smooth stochastic LFO."""
-        t = np.linspace(0, length / self.sample_rate, length, endpoint=False)
-        noise = np.random.normal(0, 1, length)
-        noise = np.convolve(noise, np.ones(200)/200, mode='same')  # Smooth over 200 samples
-        return depth * noise * np.sin(2 * np.pi * rate * t)  # Slow modulation
+    def _simple_compressor(self, signal, threshold=0.7, ratio=4.0):
+        output = signal.copy()
+        for i in range(len(signal)):
+            if abs(signal[i]) > threshold:
+                gain = threshold + (abs(signal[i]) - threshold) / ratio
+                output[i] = np.sign(signal[i]) * gain if signal[i] != 0 else 0
+        return output / np.max(np.abs(output))
 
-    def delay(self, input_file, output_file, delay_time=0.25, feedback=0.5, mix=0.5, 
-              mode="digital", lp_cutoff=1500, flutter_rate=0.5, flutter_depth=0.005, 
-              pitch_drift=0.1, timing_jitter=0.05, hiss_level=0.0001):
-        """Applies digital or analog delay to an audio file."""
-        
+    def delay(self, input_file, output_file, delay_time=0.25, feedback=0.7, mix=0.5, 
+              mode="digital", lp_cutoff=3000, flutter_base_rate=5.0, flutter_depth=0.005, 
+              pitch_drift_depth=0.1, drive=2.0, resonance=0.7, q=1.0, threshold=0.7, ratio=4.0):
         # Load audio
-        audio, sr = sf.read(input_file)
-        if sr != self.sample_rate:
-            audio = librosa.resample(audio, orig_sr=sr, target_sr=self.sample_rate)
+        samplerate, audio = wavfile.read(input_file)
+        if samplerate != self.sample_rate:
+            audio = librosa.resample(audio.astype(np.float64), orig_sr=samplerate, target_sr=self.sample_rate)
         if audio.ndim > 1:
             audio = np.mean(audio, axis=1)
-        audio = audio / np.max(np.abs(audio))  # Normalize input
-
+        audio = audio / np.max(np.abs(audio))  # Normalize
+        
         total_samples = len(audio)
         delay_samples = int(delay_time * self.sample_rate)
         output = np.zeros(total_samples)
-        buffer = np.zeros(total_samples + delay_samples)
+        delayed_buffer = np.zeros(total_samples + delay_samples)
         
-        # Hiss for analog mode
-        hiss = np.zeros(total_samples)
-        if mode == "analog" and hiss_level > 0:
-            hiss = np.random.normal(0, 1, total_samples)
-            hiss = np.convolve(hiss, np.ones(50)/50, mode='same')
-            hiss = self._lowpass_filter(hiss, 500) * hiss_level  # Darker hiss
-        
-        # Slow stochastic LFOs for flutter and pitch drift
-        if mode == "analog":
-            flutter_lfo = self._smooth_lfo(total_samples, flutter_rate, flutter_depth)
-            pitch_lfo = self._smooth_lfo(total_samples, 0.05, pitch_drift)  # Slower 0.05 Hz drift
-
-        # Process signal
+        # Process raw delay into delayed_buffer
         for i in range(total_samples):
-            # Compute delay position
             delay_pos = i - delay_samples
-            if mode == "analog":
-                flutter = flutter_lfo[i]
-                jitter = np.random.uniform(-timing_jitter, timing_jitter)
-                drift = pitch_lfo[i]
-                # delay_pos = i - int((delay_time + flutter + jitter + drift) * self.sample_rate)
-                delay_pos = i - int((delay_time  + jitter + drift) * self.sample_rate)
-
-                delay_pos = max(0, min(delay_pos, len(buffer) - 1))  # Clamp
-            
-            # Fetch delayed signal
-            delayed = buffer[delay_pos] if delay_pos >= 0 else 0.0
-            if mode == "analog":
-                delayed_chunk = np.array([delayed] * int(0.01 * self.sample_rate))
-                delayed = self._lowpass_filter(delayed_chunk, lp_cutoff)[0]
-                delayed = self._soft_clip(delayed, gain=1.0)
-            
-            # Mix output with boosted wet signal
-            output[i] = audio[i] * (1 - mix) + (delayed * 2.0) * mix + hiss[i] * (1 - mix)
-            
-            # Update buffer with feedback
-            buffer[i] = audio[i] + feedback * delayed
-            
-            # Log every 0.25s
+            delayed = delayed_buffer[delay_pos] if delay_pos >= 0 and delay_pos < len(delayed_buffer) else 0
+            delayed_buffer[i] = audio[i] + feedback * delayed
+        
+        # Apply analog effects to delayed signal
+        wet_signal = delayed_buffer[:total_samples]
+        if mode == "analog":
+            wet_signal = self.pitch_drift(wet_signal, drift_depth=pitch_drift_depth, drift_rate=0.05)
+            wet_signal = self.flutter_effect(wet_signal, base_rate=flutter_base_rate, rate_diff=1.0, 
+                                            depth=flutter_depth)
+            wet_signal = self._lowpass_filter(wet_signal, cutoff=lp_cutoff)
+            wet_signal = self._tape_saturation(wet_signal, drive=drive, warmth=0.1)
+            wet_signal = self._simple_compressor(wet_signal, threshold=threshold, ratio=ratio)
+        
+        # Mix dry and wet
+        for i in range(total_samples):
+            output[i] = audio[i] * (1 - mix) + wet_signal[i] * mix
             if i % delay_samples < 10:
-                print(f"Sample {i}: Input {audio[i]:.5f}, DelayPos {delay_pos}, Delayed {delayed:.5f}, Buffer[{i}] {buffer[i]:.5f}, Output {output[i]:.5f}")
-
+                print(f"Sample {i}: Dry {audio[i]:.5f}, Wet {wet_signal[i]:.5f}, Output {output[i]:.5f}")
+        
         # Normalize
         max_amp = np.max(np.abs(output))
         if max_amp > 0:
             output = output / max_amp
         print(f"Output max amp: {max_amp:.5f} (post-norm: {np.max(np.abs(output)):.5f})")
-
+        
         # Save
-        sf.write(output_file, output, self.sample_rate, subtype='PCM_16')
+        wavfile.write(output_file, self.sample_rate, output.astype(np.float32))
         print(f"Delayed audio saved to {output_file}")
 
 # Test it
@@ -103,9 +117,9 @@ if __name__ == "__main__":
     
     # Digital mode: Clean delay
     delay.delay("input.wav", "delay_digital.wav", delay_time=0.25, feedback=0.5, mix=0.5, 
-                mode="digital", lp_cutoff=5000)
+                mode="digital")
     
     # Analog mode: Tape echo
-    delay.delay("input.wav", "delay_analog.wav", delay_time=0.25, feedback=0.7, mix=0.9, 
-                mode="analog", lp_cutoff=1000, flutter_rate=0.5, flutter_depth=0.005, 
-                pitch_drift=0.1, timing_jitter=0.05, hiss_level=0.0001)
+    delay.delay("input.wav", "delay_analog.wav", delay_time=0.05, feedback=0.8, mix=0.7, 
+                mode="analog", lp_cutoff=6000, flutter_base_rate=5.0, flutter_depth=0.01, 
+                pitch_drift_depth=0.1, drive=6.0, resonance=0.7, q=1.0, threshold=0.9, ratio=4.0)
