@@ -23,3 +23,8 @@ Thumbs.db  # Windows system file
 venv/
 .env/
 *.env
+
+
+
+# Include impulse response files
+!audio_dsp/effects/impulse_response/*
