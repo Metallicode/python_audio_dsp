@@ -83,7 +83,7 @@ def temporal_gravity_warp(input_signal, sample_rate=44100, gravity_factor=2.0, w
 # Test it
 if __name__ == "__main__":
     # Load sample data
-    samplerate, data = wavfile.read("voice.wav")
+    samplerate, data = wavfile.read("input.wav")
     if samplerate != 44100:
         data = librosa.resample(data.astype(np.float64), orig_sr=samplerate, target_sr=44100)
     if data.ndim > 1:
