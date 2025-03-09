@@ -122,7 +122,7 @@ def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_l
 
 # Example usage
 if __name__ == "__main__":
-    input_file = "loop.wav"  # Replace with your WAV file
+    input_file = "sequence.wav"  # Replace with your WAV file
     glitch_machine(
         input_file=input_file,
         output_file="glitched_loop_weird.wav",

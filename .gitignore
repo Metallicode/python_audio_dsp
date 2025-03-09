@@ -6,6 +6,7 @@ __init__.cpython-38.pyc
 
 # Ignore WAV and other audio files
 *.wav
+*.WAV
 *.mp3
 *.flac
 *.ogg
