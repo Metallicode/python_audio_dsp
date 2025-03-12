@@ -88,7 +88,7 @@ def lofi_effect(input_signal, sample_rate=44100, drive=5.0, quantize_q=0.3,
 # Test it
 if __name__ == "__main__":
     # Load sample data
-    samplerate, data = wavfile.read("input.wav")
+    samplerate, data = wavfile.read("sequence.wav")
     if samplerate != 44100:
         data = librosa.resample(data.astype(np.float64), orig_sr=samplerate, target_sr=44100)
     if data.ndim > 1:
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     
     # Apply lo-fi effect
     lofi = lofi_effect(data, sample_rate=44100, drive=1.0, quantize_q=0.3, 
-                       reduced_sample_rate=30000, kbps_rate=156, mp3_iterations=500)
+                       reduced_sample_rate=30000, kbps_rate=156, mp3_iterations=5)
     
     # Save output
     wavfile.write("lofi_effect.wav", 44100, lofi.astype(np.float32))

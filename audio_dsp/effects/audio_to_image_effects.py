@@ -312,7 +312,7 @@ def image_to_audio(img, original_audio, sr, n_fft, hop_length):
 # Example workflow with new effects
 if __name__ == "__main__":
     # Convert audio to image
-    img, original_audio, sr, n_fft, hop_length = audio_to_image("input.wav", size=256)
+    img, original_audio, sr, n_fft, hop_length = audio_to_image("sequence.wav", size=256)
     show_image(img, "Original Audio Image")
 
     # Apply effects

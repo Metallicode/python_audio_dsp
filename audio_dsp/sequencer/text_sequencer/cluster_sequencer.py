@@ -154,7 +154,7 @@ if __name__ == "__main__":
         cluster_file="cluster_mapping.json",
         samples_dir="cluster_samples",
         output_file="sequence.wav",
-        bpm=280,
-        output_length=32,
+        bpm=180,
+        output_length=64,
         random_seed=42
     )

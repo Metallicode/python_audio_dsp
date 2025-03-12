@@ -17,7 +17,7 @@ import json
 SAMPLE_DIR = "cluster_samples"  # Folder with .wav files
 SAMPLE_RATE = 44100
 SPECTROGRAM_SIZE = (100, 100)  # Resize spectrograms for consistency
-NUM_CLUSTERS = 3  # Default number of clusters
+NUM_CLUSTERS = 4  # Default number of clusters
 
 # Initialize pygame for audio
 pygame.mixer.init()
