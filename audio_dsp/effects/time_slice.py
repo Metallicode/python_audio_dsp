@@ -144,6 +144,6 @@ def main(input_file, output_file, window_size=512):
 if __name__ == "__main__":
     input_file = "sequence.wav"  # Replace with your path
     output_file = "sine_chain_output.wav"
-    window_size = 1212  # Samples per window 
+    window_size = 512  # Samples per window 
     
     main(input_file, output_file, window_size)
