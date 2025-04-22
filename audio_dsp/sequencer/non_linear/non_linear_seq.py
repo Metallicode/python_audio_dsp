@@ -148,7 +148,7 @@ def visualize_pattern(events, liquid_times, loop_length, bpm):
 def main():
     samples_dir = "samples/"
     output_file = "liquid_rhythm.wav"
-    pattern = "K.S-H--.S.H--K---|4"  # Example with H--
+    pattern = "K.S-HK.S-H--.S.H--K---K-S.|4"  # Example with H--
     bpm = 160
     loop_length = 4
     
