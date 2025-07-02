@@ -233,7 +233,7 @@ def process_audio(input_file, output_file, distortion_type="overdrive", *args):
     plot_effects(signal, distorted_signal, distortion_type.capitalize(), transfer_x, transfer_y, *args)
 
 def main():
-    input_file = "sequence.wav"
+    input_file = "sine_chain_output.wav"
     distortions = [
         ("fuzz", 10.0, 0.3, 1.0),
         ("overdrive", 2.0, 0.5, 1.0),
