@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
-from google.colab import files
 
 SAMPLE_RATE = 44100
 
@@ -87,12 +86,14 @@ def create_morphed_signal(input_file, output_file, interval_type='octave', base_
     
     save_wav(output_file, morphed_signal)
     plot_signals(signal, morphed_signal)
-    files.download(output_file)
 
-# Upload input file
-uploaded = files.upload()
-input_file = list(uploaded.keys())[0]
 
-# Run the transformation
-output_file = "morphed_output.wav"
-create_morphed_signal(input_file, output_file, interval_type='octave', base_freq=100)
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("Usage: python frequency_splicer.py <input_file> [output_file]")
+        sys.exit(1)
+
+    input_file = sys.argv[1]
+    output_file = sys.argv[2] if len(sys.argv) > 2 else "morphed_output.wav"
+    create_morphed_signal(input_file, output_file, interval_type='octave', base_freq=100)

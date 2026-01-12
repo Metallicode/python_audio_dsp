@@ -98,14 +98,11 @@ class SuperDelay:
         # Mix dry and wet
         for i in range(total_samples):
             output[i] = audio[i] * (1 - mix) + wet_signal[i] * mix
-            if i % delay_samples < 10:
-                print(f"Sample {i}: Dry {audio[i]:.5f}, Wet {wet_signal[i]:.5f}, Output {output[i]:.5f}")
-        
+
         # Normalize
         max_amp = np.max(np.abs(output))
         if max_amp > 0:
             output = output / max_amp
-        print(f"Output max amp: {max_amp:.5f} (post-norm: {np.max(np.abs(output)):.5f})")
         
         # Save
         wavfile.write(output_file, self.sample_rate, output.astype(np.float32))

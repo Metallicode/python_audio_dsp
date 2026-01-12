@@ -119,8 +119,6 @@
 
 
 import numpy as np
-import matplotlib.pyplot as plt
-import librosa.display
 from scipy.io import wavfile
 
 def quantized_lfo_arpeggio(sample_rate=44100, freq_set=None, 
@@ -209,6 +207,7 @@ def quantized_lfo_arpeggio(sample_rate=44100, freq_set=None,
     
     # Visualization
     if visualize:
+        import matplotlib.pyplot as plt
         plt.figure(figsize=(10, 5))
         
         # Waveform plot

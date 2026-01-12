@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.io import wavfile
-import librosa
 
 def filter_effect(input_signal, sample_rate=44100, cutoff=1500, resonance=0.7, q=1.0, filter_type="lowpass"):
     """
@@ -66,11 +65,11 @@ def filter_effect(input_signal, sample_rate=44100, cutoff=1500, resonance=0.7, q
     if max_amp > 0:
         output = output / max_amp
     
-    print(f"{filter_type} filter output range: {np.min(output):.5f} to {np.max(output):.5f}")
     return output
 
 # Test it
 if __name__ == "__main__":
+    import librosa
     # Load sample data
     samplerate, data = wavfile.read("input.wav")
     if samplerate != 44100:

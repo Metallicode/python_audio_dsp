@@ -118,7 +118,6 @@ class SubtractiveSynth:
                 y3 *= 0.98
                 output[i] = y2 - y3
         
-        print(f"{filter_type} filter output range: {np.min(output):.5f} to {np.max(output):.5f}")
         output = np.tanh(output)  # Final clip
         return output
 

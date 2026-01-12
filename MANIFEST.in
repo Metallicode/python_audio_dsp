@@ -1,0 +1,4 @@
+include LICENSE
+include README.md
+recursive-include audio_dsp *.wav
+recursive-include audio_dsp *.mid
