@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Utilities - Python Audio DSP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">~</div>
+                <span>audio_dsp</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="synths.html">Synths</a></li>
+                <li><a href="effects.html">Effects</a></li>
+                <li><a href="utils.html" class="active">Utils</a></li>
+                <li><a href="sequencers.html">Sequencers</a></li>
+                <li><a href="midi.html">MIDI</a></li>
+            </ul>
+            <a href="https://github.com/Metallicode/python_audio_dsp" class="nav-github" target="_blank">
+                GitHub
+            </a>
+            <a href="https://buymeacoffee.com/metallicode?new=1" class="btn-support" target="_blank">Support</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="two-col">
+            <div>
+                <header class="page-header">
+                    <h1>Utilities</h1>
+                    <p>Scale generators, Arabic maqamat, spectral analysis, noise algorithms, and helper functions.</p>
+                </header>
+
+                <div class="quick-links">
+                    <a href="#scales" class="quick-link">Scales & Intervals</a>
+                    <a href="#maqamat" class="quick-link">Maqamat</a>
+                    <a href="#basic" class="quick-link">Basic Functions</a>
+                    <a href="#noise" class="quick-link">Noise Algorithms</a>
+                    <a href="#spectral" class="quick-link">Spectral Analysis</a>
+                    <a href="#transient" class="quick-link">Transient Extraction</a>
+                </div>
+
+                <!-- Scales & Intervals -->
+                <section id="scales">
+                    <h2>Scales & Intervals</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Scale Generation</h3>
+                                    <span class="module-badge">utils.scales_and_melody</span>
+                                </div>
+                                <p class="module-desc">Generate equal-tempered scales and categorize intervals by cents.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <details open>
+                                <summary>generate_scale()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">root_freq</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td>Base frequency in Hz (e.g., 440 for A4)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">divisions</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td>Number of equal divisions per octave (12 = standard, 19, 31 for microtonal)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p style="color: var(--text-secondary); margin-top: 0.5rem;"><strong>Returns:</strong> (frequencies list, cents list 0-1200)</p>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>categorise_interval()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">cents</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">required</span></td>
+                                                <td>Interval size in cents</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">threshold</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">20</span></td>
+                                                <td>Max cents error for matching</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p style="color: var(--text-secondary); margin-top: 0.5rem;"><strong>Returns:</strong> (interval_name, error_cents) or ("Novel interval", error)</p>
+
+                                    <h4 style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">Recognized Intervals</h4>
+                                    <table class="params-table" style="margin-top: 0.5rem;">
+                                        <thead>
+                                            <tr>
+                                                <th>Cents</th>
+                                                <th>Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>0</td><td>Unison</td></tr>
+                                            <tr><td>100</td><td>Minor 2nd</td></tr>
+                                            <tr><td>200</td><td>Major 2nd</td></tr>
+                                            <tr><td>300</td><td>Minor 3rd</td></tr>
+                                            <tr><td>400</td><td>Major 3rd</td></tr>
+                                            <tr><td>500</td><td>Perfect 4th</td></tr>
+                                            <tr><td>600</td><td>Tritone</td></tr>
+                                            <tr><td>700</td><td>Perfect 5th</td></tr>
+                                            <tr><td>800</td><td>Minor 6th</td></tr>
+                                            <tr><td>900</td><td>Major 6th</td></tr>
+                                            <tr><td>1000</td><td>Minor 7th</td></tr>
+                                            <tr><td>1100</td><td>Major 7th</td></tr>
+                                            <tr><td>1200</td><td>Octave</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.utils <span class="keyword">import</span> generate_scale, categorise_interval
+
+<span class="comment"># Standard 12-TET scale from A4</span>
+freqs, cents = generate_scale(root_freq=<span class="number">440</span>, divisions=<span class="number">12</span>)
+<span class="keyword">print</span>(freqs)  <span class="comment"># [440.0, 466.16, 493.88, 523.25, ...]</span>
+<span class="keyword">print</span>(cents)  <span class="comment"># [0, 100, 200, 300, 400, ...]</span>
+
+<span class="comment"># 19-TET microtonal scale</span>
+freqs_19, cents_19 = generate_scale(<span class="number">440</span>, divisions=<span class="number">19</span>)
+<span class="keyword">print</span>(f<span class="string">"Step size: {cents_19[1]:.1f} cents"</span>)  <span class="comment"># ~63.2 cents</span>
+
+<span class="comment"># Analyze intervals</span>
+<span class="keyword">for</span> c <span class="keyword">in</span> cents_19[:<span class="number">8</span>]:
+    name, error = categorise_interval(c)
+    <span class="keyword">print</span>(f<span class="string">"{c:.1f} cents: {name} (error: {error:.1f})"</span>)
+
+<span class="comment"># Check perfect fifth (should be ~700 cents)</span>
+name, error = categorise_interval(<span class="number">702</span>)
+<span class="keyword">print</span>(f<span class="string">"{name}: {error} cents flat/sharp"</span>)  <span class="comment"># Perfect 5th: 2 cents sharp</span></code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Maqamat -->
+                <section id="maqamat">
+                    <h2>Arabic Maqamat</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>generate_maqam_frequencies</h3>
+                                    <span class="module-badge">utils.maqamat</span>
+                                </div>
+                                <p class="module-desc">Generate frequencies for Arabic maqam scales with quarter-tone microtonal intervals.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Parameters</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">maqam_name</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Name of the maqam</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">num_of_notes</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Number of notes to generate</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">root_freq</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Base frequency in Hz</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">step_size</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">1</span></td>
+                                            <td>Step through extended maqam</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="params-section">
+                                <h4>Supported Maqamat</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Maqam</th>
+                                            <th>Character</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">Rast</span></td>
+                                            <td>Bright, fundamental</td>
+                                            <td>C D E-half-flat F G A B-half-flat C</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Bayati</span></td>
+                                            <td>Emotional, melancholic</td>
+                                            <td>D E-half-flat F G A Bb C D</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Saba</span></td>
+                                            <td>Sad, yearning</td>
+                                            <td>D E-half-flat F Gb A Bb C D</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Hijaz</span></td>
+                                            <td>Exotic, dramatic</td>
+                                            <td>D Eb F# G A Bb C D</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Nahawand</span></td>
+                                            <td>Minor-like, gentle</td>
+                                            <td>C D Eb F G Ab B C</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Kurd</span></td>
+                                            <td>Phrygian-like</td>
+                                            <td>D Eb F G A Bb C D</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Nahawand Murassah</span></td>
+                                            <td>Decorated minor</td>
+                                            <td>Nahawand with ornaments</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Sikah</span></td>
+                                            <td>Mystical, floating</td>
+                                            <td>E-half-flat F G A B-half-flat C D</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.utils <span class="keyword">import</span> generate_maqam_frequencies
+<span class="keyword">from</span> audio_dsp.utils <span class="keyword">import</span> sine_wave, apply_envelope
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+<span class="comment"># Generate Maqam Rast from D (293.66 Hz)</span>
+rast_freqs = generate_maqam_frequencies(
+    maqam_name=<span class="string">"Rast"</span>,
+    num_of_notes=<span class="number">8</span>,
+    root_freq=<span class="number">293.66</span>
+)
+<span class="keyword">print</span>(rast_freqs)
+
+<span class="comment"># Generate Maqam Hijaz from A</span>
+hijaz_freqs = generate_maqam_frequencies(
+    maqam_name=<span class="string">"Hijaz"</span>,
+    num_of_notes=<span class="number">15</span>,
+    root_freq=<span class="number">220</span>,
+    step_size=<span class="number">1</span>
+)
+
+<span class="comment"># Play the scale</span>
+audio = []
+<span class="keyword">for</span> freq <span class="keyword">in</span> rast_freqs:
+    note = sine_wave(freq, duration=<span class="number">0.5</span>)
+    note = apply_envelope(note, <span class="number">44100</span>)
+    audio.append(note)
+
+sf.write(<span class="string">"maqam_rast.wav"</span>, np.concatenate(audio), <span class="number">44100</span>)
+
+<span class="comment"># Emotional Bayati scale</span>
+bayati_freqs = generate_maqam_frequencies(<span class="string">"Bayati"</span>, <span class="number">8</span>, <span class="number">293.66</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Basic Functions -->
+                <section id="basic">
+                    <h2>Basic Functions</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Audio Helpers</h3>
+                                    <span class="module-badge">utils</span>
+                                </div>
+                                <p class="module-desc">Basic waveform generation and envelope functions.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <details open>
+                                <summary>sine_wave()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">freq</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">required</span></td>
+                                                <td>Frequency in Hz</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">duration</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">required</span></td>
+                                                <td>Duration in seconds</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">sample_rate</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td><span class="param-default">44100</span></td>
+                                                <td>Sample rate in Hz</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">amplitude</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.5</span></td>
+                                                <td>Peak amplitude (0-1)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p style="color: var(--text-secondary); margin-top: 0.5rem;"><strong>Returns:</strong> numpy array of audio samples</p>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>apply_envelope()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">signal</span></td>
+                                                <td><span class="param-type">np.array</span></td>
+                                                <td><span class="param-default">required</span></td>
+                                                <td>Input audio signal</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">sample_rate</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td><span class="param-default">required</span></td>
+                                                <td>Sample rate in Hz</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">fade_duration</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.05</span></td>
+                                                <td>Fade in/out time in seconds</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p style="color: var(--text-secondary); margin-top: 0.5rem;"><strong>Returns:</strong> Signal with linear fade-in and fade-out applied (prevents clicks)</p>
+                                </div>
+                            </details>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.utils <span class="keyword">import</span> sine_wave, apply_envelope
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+<span class="comment"># Generate a simple tone</span>
+tone = sine_wave(freq=<span class="number">440</span>, duration=<span class="number">1.0</span>, amplitude=<span class="number">0.8</span>)
+
+<span class="comment"># Apply envelope to prevent clicks</span>
+tone = apply_envelope(tone, sample_rate=<span class="number">44100</span>, fade_duration=<span class="number">0.02</span>)
+
+sf.write(<span class="string">"tone.wav"</span>, tone, <span class="number">44100</span>)
+
+<span class="comment"># Create a melody</span>
+melody_freqs = [<span class="number">262</span>, <span class="number">294</span>, <span class="number">330</span>, <span class="number">349</span>, <span class="number">392</span>]  <span class="comment"># C D E F G</span>
+melody = []
+<span class="keyword">for</span> f <span class="keyword">in</span> melody_freqs:
+    note = sine_wave(f, <span class="number">0.4</span>)
+    note = apply_envelope(note, <span class="number">44100</span>)
+    melody.append(note)
+
+sf.write(<span class="string">"melody.wav"</span>, np.concatenate(melody), <span class="number">44100</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Noise Algorithms -->
+                <section id="noise">
+                    <h2>Noise Algorithms</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Noise Generation</h3>
+                                    <span class="module-badge">utils.noise_algorithms</span>
+                                </div>
+                                <p class="module-desc">Perlin noise, simplex noise, and fractal noise generation for modulation and textures.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="method-list">
+                                <div class="method-item">
+                                    <span class="method-name">perlin_noise()</span>
+                                    <p class="method-desc">Classic Perlin noise for smooth, natural-sounding modulation.</p>
+                                </div>
+                                <div class="method-item">
+                                    <span class="method-name">simplex_noise()</span>
+                                    <p class="method-desc">Improved noise algorithm with fewer directional artifacts.</p>
+                                </div>
+                                <div class="method-item">
+                                    <span class="method-name">fractal_noise()</span>
+                                    <p class="method-desc">Multi-octave noise for complex, evolving textures.</p>
+                                </div>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.utils.noise_algorithms <span class="keyword">import</span> perlin_noise
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Generate smooth modulation curve</span>
+modulation = perlin_noise(
+    length=<span class="number">44100</span>,  <span class="comment"># 1 second of samples</span>
+    scale=<span class="number">0.01</span>     <span class="comment"># Controls smoothness</span>
+)
+
+<span class="comment"># Use for LFO modulation</span>
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+audio, sr = sf.read(<span class="string">"input.wav"</span>)
+
+<span class="comment"># Modulate amplitude with Perlin noise</span>
+modulated = audio * (<span class="number">0.5</span> + <span class="number">0.5</span> * modulation[:len(audio)])</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Spectral Analysis -->
+                <section id="spectral">
+                    <h2>Spectral Analysis</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Spectral Analyzer</h3>
+                                    <span class="module-badge">utils.spectral_analyzer</span>
+                                    <span class="module-badge" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">requires librosa</span>
+                                </div>
+                                <p class="module-desc">FFT analysis, spectral peak detection, and frequency analysis tools.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="method-list">
+                                <div class="method-item">
+                                    <span class="method-name">analyze_spectrum()</span>
+                                    <p class="method-desc">Compute FFT and return frequency/magnitude data.</p>
+                                </div>
+                                <div class="method-item">
+                                    <span class="method-name">find_peaks()</span>
+                                    <p class="method-desc">Detect spectral peaks for pitch detection or analysis.</p>
+                                </div>
+                                <div class="method-item">
+                                    <span class="method-name">spectral_centroid()</span>
+                                    <p class="method-desc">Calculate the "center of mass" of the spectrum (brightness measure).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Transient Extraction -->
+                <section id="transient">
+                    <h2>Transient Extraction</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Transient Extractor</h3>
+                                    <span class="module-badge">utils.transient_extractor</span>
+                                </div>
+                                <p class="module-desc">Extract attack transients from audio for physical modeling synthesis.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.utils.transient_extractor <span class="keyword">import</span> extract_transient
+
+<span class="comment"># Extract the attack portion of a drum hit</span>
+transient = extract_transient(
+    input_file=<span class="string">"snare.wav"</span>,
+    output_file=<span class="string">"snare_transient.json"</span>,
+    threshold=<span class="number">0.1</span>,
+    attack_time=<span class="number">0.05</span>  <span class="comment"># 50ms</span>
+)
+
+<span class="comment"># Use with PhysicalModelingSynth</span>
+<span class="keyword">from</span> audio_dsp.synth.physical_modeling_synth <span class="keyword">import</span> PhysicalModelingSynth
+
+synth = PhysicalModelingSynth()
+synth.synthesize(
+    frequency=<span class="number">440</span>,
+    length=<span class="number">2.0</span>,
+    transient_file=<span class="string">"snare_transient.json"</span>,
+    spectral_file=<span class="string">"guitar_body.spectral"</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Additional Utils -->
+                <section>
+                    <h2>Additional Utilities</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Other Tools</h3>
+                                    <span class="module-badge">utils</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="method-list">
+                                <div class="method-item">
+                                    <span class="method-name">utils.arpeggio</span>
+                                    <p class="method-desc">Arpeggiation pattern generators (up, down, up-down, random).</p>
+                                </div>
+                                <div class="method-item">
+                                    <span class="method-name">utils.blend_modes</span>
+                                    <p class="method-desc">Digital blend modes for audio mixing (multiply, screen, overlay, etc.).</p>
+                                </div>
+                                <div class="method-item">
+                                    <span class="method-name">utils.image_to_audio</span>
+                                    <p class="method-desc">Convert images to audio using spectral representation. Requires PIL/cv2.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="toc">
+                <h4>On This Page</h4>
+                <ul>
+                    <li><a href="#scales">Scales & Intervals</a></li>
+                    <li><a href="#maqamat">Maqamat</a></li>
+                    <li><a href="#basic">Basic Functions</a></li>
+                    <li><a href="#noise">Noise Algorithms</a></li>
+                    <li><a href="#spectral">Spectral Analysis</a></li>
+                    <li><a href="#transient">Transient Extraction</a></li>
+                </ul>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p>Python Audio DSP &mdash; Built with NumPy, SciPy, and SoundFile</p>
+        <p><a href="https://github.com/Metallicode/python_audio_dsp">View on GitHub</a></p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequencers - Python Audio DSP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">~</div>
+                <span>audio_dsp</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="synths.html">Synths</a></li>
+                <li><a href="effects.html">Effects</a></li>
+                <li><a href="utils.html">Utils</a></li>
+                <li><a href="sequencers.html" class="active">Sequencers</a></li>
+                <li><a href="midi.html">MIDI</a></li>
+            </ul>
+            <a href="https://github.com/Metallicode/python_audio_dsp" class="nav-github" target="_blank">
+                GitHub
+            </a>
+            <a href="https://buymeacoffee.com/metallicode?new=1" class="btn-support" target="_blank">Support</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="two-col">
+            <div>
+                <header class="page-header">
+                    <h1>Sequencers</h1>
+                    <p>Algorithmic composition tools including raga generators, cellular automata, and non-linear sequencing.</p>
+                </header>
+
+                <div class="quick-links">
+                    <a href="#raga" class="quick-link">Raga Generator</a>
+                    <a href="#gol" class="quick-link">Game of Life</a>
+                    <a href="#text" class="quick-link">Text Sequencer</a>
+                    <a href="#nonlinear" class="quick-link">Non-Linear</a>
+                    <a href="#melody" class="quick-link">Melody Choice</a>
+                </div>
+
+                <!-- Raga Generator -->
+                <section id="raga">
+                    <h2>Raga Generator</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Indian Raga Sequencer</h3>
+                                    <span class="module-badge">sequencer.raga_generator</span>
+                                </div>
+                                <p class="module-desc">Time-of-day based raga selection with fractal rhythm generation and probabilistic note selection.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <details open>
+                                <summary>choose_raga()</summary>
+                                <div>
+                                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Selects an appropriate raga based on the current time of day, following traditional Indian musical practice.</p>
+                                    <p style="color: var(--text-secondary);"><strong>Returns:</strong> Dictionary with raga name, intervals, and mood information.</p>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>generate_fractal_rhythm()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">core_pattern</span></td>
+                                                <td><span class="param-type">list</span></td>
+                                                <td><span class="param-default">required</span></td>
+                                                <td>Base binary pattern [0, 1, ...]</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">depth</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td><span class="param-default">3</span></td>
+                                                <td>Fractal recursion depth</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">randomness</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.2</span></td>
+                                                <td>Probability of pattern flip (0-1)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p style="color: var(--text-secondary); margin-top: 0.5rem;"><strong>Returns:</strong> Expanded binary rhythm pattern</p>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>select_next_note()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">current_note</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td>Current scale degree (0-7)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">intervals</span></td>
+                                                <td><span class="param-type">list</span></td>
+                                                <td>Raga interval list</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p style="color: var(--text-secondary); margin-top: 0.5rem;"><strong>Returns:</strong> Next note based on probability weights</p>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>generate_random_core_pattern()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">length</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td><span class="param-default">6</span></td>
+                                                <td>Pattern length</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p style="color: var(--text-secondary); margin-top: 0.5rem;"><strong>Returns:</strong> Random binary pattern [0, 1, 0, 1, ...]</p>
+                                </div>
+                            </details>
+
+                            <div class="params-section">
+                                <h4>Ragas by Time of Day</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time Period</th>
+                                            <th>Hours</th>
+                                            <th>Ragas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">Early Morning</span></td>
+                                            <td>4 AM - 7 AM</td>
+                                            <td>Bhairav, Ramkali</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Late Morning</span></td>
+                                            <td>7 AM - 10 AM</td>
+                                            <td>Bilawal, Jaunpuri</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Afternoon</span></td>
+                                            <td>10 AM - 2 PM</td>
+                                            <td>Sarang, Brindavani Sarang</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Evening</span></td>
+                                            <td>5 PM - 10 PM</td>
+                                            <td>Yaman, Kafi</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">Night</span></td>
+                                            <td>10 PM - 4 AM</td>
+                                            <td>Malkauns, Bageshree</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.raga_generator <span class="keyword">import</span> (
+    choose_raga,
+    generate_fractal_rhythm,
+    generate_random_core_pattern,
+    select_next_note
+)
+<span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> SubtractiveSynth
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+<span class="comment"># Get raga appropriate for current time</span>
+raga = choose_raga()
+<span class="keyword">print</span>(f<span class="string">"Selected: {raga['name']}"</span>)
+
+<span class="comment"># Generate fractal rhythm pattern</span>
+core = generate_random_core_pattern(length=<span class="number">5</span>)
+rhythm = generate_fractal_rhythm(core, depth=<span class="number">4</span>, randomness=<span class="number">0.15</span>)
+<span class="keyword">print</span>(f<span class="string">"Pattern: {rhythm}"</span>)
+
+<span class="comment"># Generate melody using probabilistic note selection</span>
+synth = SubtractiveSynth()
+synth.osc_wave = <span class="string">"sine"</span>
+synth.attack = <span class="number">0.1</span>
+synth.release = <span class="number">0.3</span>
+
+base_freq = <span class="number">220</span>  <span class="comment"># A3</span>
+current_note = <span class="number">0</span>
+melody_audio = []
+
+<span class="keyword">for</span> beat <span class="keyword">in</span> rhythm:
+    <span class="keyword">if</span> beat == <span class="number">1</span>:
+        <span class="comment"># Play a note</span>
+        freq = base_freq * (<span class="number">2</span> ** (raga[<span class="string">'intervals'</span>][current_note] / <span class="number">12</span>))
+        note = synth.synthesize(freq, <span class="number">0.25</span>)
+        current_note = select_next_note(current_note, raga[<span class="string">'intervals'</span>])
+    <span class="keyword">else</span>:
+        <span class="comment"># Rest</span>
+        note = np.zeros(<span class="keyword">int</span>(<span class="number">0.25</span> * <span class="number">44100</span>))
+
+    melody_audio.append(note)
+
+sf.write(<span class="string">"raga_melody.wav"</span>, np.concatenate(melody_audio), <span class="number">44100</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Game of Life -->
+                <section id="gol">
+                    <h2>Game of Life Sequencer</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Conway's Game of Life</h3>
+                                    <span class="module-badge">sequencer.GOL</span>
+                                </div>
+                                <p class="module-desc">Map cellular automaton evolution to musical sequences with EDO tuning support.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Available Modules</h4>
+                                <div class="method-list">
+                                    <div class="method-item">
+                                        <span class="method-name">sequencer.GOL.game_of_life</span>
+                                        <p class="method-desc">Standard Game of Life mapped to 12-TET chromatic scale. Grid rows = pitches, columns = time steps.</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">sequencer.GOL.game_of_life_edo</span>
+                                        <p class="method-desc">EDO (Equal Division of Octave) variant supporting microtonal scales (19-EDO, 31-EDO, etc.).</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Concept</h4>
+                                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                    The Game of Life sequencer maps a 2D cellular automaton grid to musical events:
+                                </p>
+                                <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1rem;">
+                                    <li><strong>Rows</strong> = Pitch (higher row = higher pitch)</li>
+                                    <li><strong>Columns</strong> = Time (left to right)</li>
+                                    <li><strong>Live cells</strong> = Notes played</li>
+                                    <li><strong>Dead cells</strong> = Silence</li>
+                                </ul>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.GOL.game_of_life <span class="keyword">import</span> GameOfLifeSequencer
+
+<span class="comment"># Create sequencer with 8 pitches, 16 time steps</span>
+gol = GameOfLifeSequencer(rows=<span class="number">8</span>, cols=<span class="number">16</span>)
+
+<span class="comment"># Initialize with random pattern</span>
+gol.randomize(density=<span class="number">0.3</span>)
+
+<span class="comment"># Generate sequence for 4 generations</span>
+sequence = gol.generate(generations=<span class="number">4</span>, base_freq=<span class="number">220</span>)
+
+<span class="comment"># Export to audio</span>
+gol.export(<span class="string">"gol_sequence.wav"</span>, bpm=<span class="number">120</span>)
+
+<span class="comment"># EDO variant for microtonal</span>
+<span class="keyword">from</span> audio_dsp.sequencer.GOL.game_of_life_edo <span class="keyword">import</span> GameOfLifeEDO
+
+gol_micro = GameOfLifeEDO(rows=<span class="number">19</span>, cols=<span class="number">16</span>, divisions=<span class="number">19</span>)
+gol_micro.randomize()
+gol_micro.generate(generations=<span class="number">3</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Text Sequencer -->
+                <section id="text">
+                    <h2>Text-Based Sequencer</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Text to Music</h3>
+                                    <span class="module-badge">sequencer.text_sequencer</span>
+                                </div>
+                                <p class="module-desc">Convert text input into musical sequences with sample clustering support.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Available Modules</h4>
+                                <div class="method-list">
+                                    <div class="method-item">
+                                        <span class="method-name">text_sequencer.py</span>
+                                        <p class="method-desc">Convert text strings to note sequences based on character mapping.</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">cluster_sequencer.py</span>
+                                        <p class="method-desc">Use audio sample clusters to generate varied sequences.</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">cluster_sampler.py</span>
+                                        <p class="method-desc">Play back samples from defined clusters.</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">sample_clustering.py</span>
+                                        <p class="method-desc">K-means clustering of audio samples by spectral features.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.text_sequencer.text_sequencer <span class="keyword">import</span> TextSequencer
+
+<span class="comment"># Create text-to-music converter</span>
+seq = TextSequencer()
+
+<span class="comment"># Convert text to note sequence</span>
+notes = seq.text_to_notes(<span class="string">"Hello World!"</span>)
+<span class="keyword">print</span>(notes)  <span class="comment"># List of frequencies/MIDI notes</span>
+
+<span class="comment"># Generate audio from text</span>
+seq.generate_audio(
+    text=<span class="string">"The quick brown fox"</span>,
+    output_file=<span class="string">"text_music.wav"</span>,
+    duration_per_char=<span class="number">0.2</span>
+)
+
+<span class="comment"># Sample clustering</span>
+<span class="keyword">from</span> audio_dsp.sequencer.text_sequencer.sample_clustering <span class="keyword">import</span> cluster_samples
+
+<span class="comment"># Cluster drum samples by spectral similarity</span>
+clusters = cluster_samples(
+    sample_dir=<span class="string">"drums/"</span>,
+    n_clusters=<span class="number">4</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Non-Linear Sequencer -->
+                <section id="nonlinear">
+                    <h2>Non-Linear Sequencer</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Chaotic Sequencing</h3>
+                                    <span class="module-badge">sequencer.non_linear</span>
+                                </div>
+                                <p class="module-desc">Generate sequences using strange attractors and chaotic systems.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Concept</h4>
+                                <p style="color: var(--text-secondary);">
+                                    Non-linear sequencing uses mathematical chaos (Lorenz attractor, logistic map, etc.)
+                                    to generate unpredictable but structured musical patterns. The chaotic systems produce
+                                    values that are deterministic but highly sensitive to initial conditions, creating
+                                    organic-feeling sequences.
+                                </p>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.non_linear.non_linear_seq <span class="keyword">import</span> NonLinearSequencer
+
+<span class="comment"># Create chaotic sequencer</span>
+seq = NonLinearSequencer()
+
+<span class="comment"># Generate using Lorenz attractor</span>
+sequence = seq.lorenz_sequence(
+    steps=<span class="number">64</span>,
+    sigma=<span class="number">10.0</span>,
+    rho=<span class="number">28.0</span>,
+    beta=<span class="number">8.0</span>/<span class="number">3.0</span>
+)
+
+<span class="comment"># Map to musical scale</span>
+notes = seq.map_to_scale(sequence, scale=<span class="string">"minor"</span>, root=<span class="number">60</span>)
+
+<span class="comment"># Logistic map for rhythm</span>
+rhythm = seq.logistic_map(
+    steps=<span class="number">32</span>,
+    r=<span class="number">3.9</span>,  <span class="comment"># Chaos parameter (3.57-4.0 for chaos)</span>
+    x0=<span class="number">0.5</span>  <span class="comment"># Initial value</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Melody Choice -->
+                <section id="melody">
+                    <h2>Melody Choice</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Algorithmic Melody</h3>
+                                    <span class="module-badge">sequencer.melody_choice</span>
+                                </div>
+                                <p class="module-desc">Probabilistic and rule-based melody generation algorithms.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.melody_choice <span class="keyword">import</span> MelodyGenerator
+
+gen = MelodyGenerator()
+
+<span class="comment"># Generate melody with constraints</span>
+melody = gen.generate(
+    length=<span class="number">16</span>,
+    scale=<span class="string">"pentatonic"</span>,
+    root=<span class="number">60</span>,  <span class="comment"># Middle C</span>
+    range_octaves=<span class="number">2</span>,
+    step_preference=<span class="number">0.7</span>,  <span class="comment"># Prefer stepwise motion</span>
+    contour=<span class="string">"arch"</span>  <span class="comment"># Overall shape</span>
+)
+
+<span class="comment"># Apply rhythmic pattern</span>
+rhythm = [<span class="number">1</span>, <span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">2</span>]
+sequence = gen.apply_rhythm(melody, rhythm)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="toc">
+                <h4>On This Page</h4>
+                <ul>
+                    <li><a href="#raga">Raga Generator</a></li>
+                    <li><a href="#gol">Game of Life</a></li>
+                    <li><a href="#text">Text Sequencer</a></li>
+                    <li><a href="#nonlinear">Non-Linear</a></li>
+                    <li><a href="#melody">Melody Choice</a></li>
+                </ul>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p>Python Audio DSP &mdash; Built with NumPy, SciPy, and SoundFile</p>
+        <p><a href="https://github.com/Metallicode/python_audio_dsp">View on GitHub</a></p>
+    </footer>
+</body>
+</html>

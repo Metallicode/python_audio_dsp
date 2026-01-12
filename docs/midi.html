@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIDI Tools - Python Audio DSP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">~</div>
+                <span>audio_dsp</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="synths.html">Synths</a></li>
+                <li><a href="effects.html">Effects</a></li>
+                <li><a href="utils.html">Utils</a></li>
+                <li><a href="sequencers.html">Sequencers</a></li>
+                <li><a href="midi.html" class="active">MIDI</a></li>
+            </ul>
+            <a href="https://github.com/Metallicode/python_audio_dsp" class="nav-github" target="_blank">
+                GitHub
+            </a>
+            <a href="https://buymeacoffee.com/metallicode?new=1" class="btn-support" target="_blank">Support</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="two-col">
+            <div>
+                <header class="page-header">
+                    <h1>MIDI Tools</h1>
+                    <p>MIDI generation, processing, looping, and alternative tuning systems.</p>
+                </header>
+
+                <div class="quick-links">
+                    <a href="#polyrhythm" class="quick-link">Polyrhythmic MIDI</a>
+                    <a href="#looper" class="quick-link">MIDI Looper</a>
+                    <a href="#retune" class="quick-link">MIDI Retuning</a>
+                    <a href="#tunings" class="quick-link">Logarithmic Tunings</a>
+                </div>
+
+                <div class="install-block" style="margin-bottom: 2rem;">
+                    <h3>Requirements</h3>
+                    <div class="install-options">
+                        <div class="install-option">
+                            <span class="install-label">Install MIDI support:</span>
+                            <code class="install-cmd">pip install audio_dsp[midi]</code>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-top: 1rem; font-size: 0.875rem;">
+                        MIDI tools require the <code>mido</code> library for reading/writing MIDI files.
+                    </p>
+                </div>
+
+                <!-- Polyrhythmic MIDI -->
+                <section id="polyrhythm">
+                    <h2>Polyrhythmic MIDI Generator</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Polyrhythmic Patterns</h3>
+                                    <span class="module-badge">midi.polyrhythmic_midi</span>
+                                    <span class="module-badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">requires mido</span>
+                                </div>
+                                <p class="module-desc">Generate complex polyrhythmic MIDI patterns with multiple overlapping time signatures.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Concept</h4>
+                                <p style="color: var(--text-secondary);">
+                                    Polyrhythms occur when two or more rhythmic patterns with different subdivisions play simultaneously.
+                                    Common examples include 3:2 (three against two), 4:3, 5:4, and more complex ratios. This module
+                                    generates MIDI files with multiple tracks, each following its own rhythmic subdivision.
+                                </p>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.midi.polyrhythmic_midi <span class="keyword">import</span> generate_polyrhythmic_midi
+
+<span class="comment"># Generate 3:2 polyrhythm</span>
+generate_polyrhythmic_midi(
+    output_file=<span class="string">"polyrhythm_3_2.mid"</span>,
+    ratios=[<span class="number">3</span>, <span class="number">2</span>],
+    bars=<span class="number">4</span>,
+    bpm=<span class="number">120</span>,
+    notes=[<span class="number">60</span>, <span class="number">64</span>]  <span class="comment"># C4, E4</span>
+)
+
+<span class="comment"># Complex 5:4:3 polyrhythm</span>
+generate_polyrhythmic_midi(
+    output_file=<span class="string">"complex_poly.mid"</span>,
+    ratios=[<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>],
+    bars=<span class="number">8</span>,
+    bpm=<span class="number">100</span>,
+    notes=[<span class="number">48</span>, <span class="number">55</span>, <span class="number">62</span>]  <span class="comment"># C3, G3, D4</span>
+)
+
+<span class="comment"># African-style 12:8 feel</span>
+generate_polyrhythmic_midi(
+    output_file=<span class="string">"african_12_8.mid"</span>,
+    ratios=[<span class="number">4</span>, <span class="number">3</span>],  <span class="comment"># 4 against 3</span>
+    bars=<span class="number">4</span>,
+    bpm=<span class="number">110</span>,
+    notes=[<span class="number">36</span>, <span class="number">42</span>],  <span class="comment"># Kick and hi-hat</span>
+    channel=<span class="number">10</span>  <span class="comment"># Drum channel</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MIDI Looper -->
+                <section id="looper">
+                    <h2>MIDI Looper</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Loop & Process MIDI</h3>
+                                    <span class="module-badge">midi.midi_looper</span>
+                                    <span class="module-badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">requires mido</span>
+                                </div>
+                                <p class="module-desc">Loop MIDI files with optional transformations like transposition, time-stretching, and velocity changes.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.midi.midi_looper <span class="keyword">import</span> MIDILooper
+
+looper = MIDILooper()
+
+<span class="comment"># Load a MIDI file</span>
+looper.load(<span class="string">"melody.mid"</span>)
+
+<span class="comment"># Create 4 loops with ascending transposition</span>
+looper.loop(
+    repetitions=<span class="number">4</span>,
+    transpose_per_loop=<span class="number">2</span>  <span class="comment"># Up a whole step each loop</span>
+)
+
+<span class="comment"># Apply velocity curve</span>
+looper.apply_velocity_curve(
+    curve=<span class="string">"crescendo"</span>,
+    min_vel=<span class="number">40</span>,
+    max_vel=<span class="number">120</span>
+)
+
+<span class="comment"># Time stretch (half speed)</span>
+looper.time_stretch(factor=<span class="number">2.0</span>)
+
+<span class="comment"># Save result</span>
+looper.save(<span class="string">"looped_melody.mid"</span>)
+
+<span class="comment"># Quick loop with transformations</span>
+looper.load(<span class="string">"bassline.mid"</span>)
+looper.loop(
+    repetitions=<span class="number">8</span>,
+    transpose_per_loop=<span class="number">0</span>,
+    velocity_variation=<span class="number">10</span>,  <span class="comment"># Random velocity +/- 10</span>
+    timing_humanize=<span class="number">5</span>  <span class="comment"># Random timing +/- 5 ticks</span>
+)
+looper.save(<span class="string">"humanized_bassline.mid"</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MIDI Retuning -->
+                <section id="retune">
+                    <h2>MIDI Retuning</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Microtonal MIDI</h3>
+                                    <span class="module-badge">midi.midi_retune</span>
+                                    <span class="module-badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">requires mido</span>
+                                </div>
+                                <p class="module-desc">Retune MIDI files to alternative tuning systems using pitch bend messages.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Supported Tunings</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tuning</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">just_intonation</span></td>
+                                            <td>Pure ratios based on harmonic series</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">pythagorean</span></td>
+                                            <td>Built on stacked perfect fifths (3:2)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">meantone</span></td>
+                                            <td>Quarter-comma meantone temperament</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">werckmeister</span></td>
+                                            <td>Werckmeister III well-temperament</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">19_edo</span></td>
+                                            <td>19 equal divisions of octave</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">31_edo</span></td>
+                                            <td>31 equal divisions of octave</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">custom</span></td>
+                                            <td>User-defined cents offsets per note</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.midi.midi_retune <span class="keyword">import</span> retune_midi
+
+<span class="comment"># Retune to just intonation</span>
+retune_midi(
+    input_file=<span class="string">"piano.mid"</span>,
+    output_file=<span class="string">"piano_just.mid"</span>,
+    tuning=<span class="string">"just_intonation"</span>,
+    root=<span class="string">"C"</span>
+)
+
+<span class="comment"># Pythagorean tuning</span>
+retune_midi(
+    input_file=<span class="string">"strings.mid"</span>,
+    output_file=<span class="string">"strings_pythagorean.mid"</span>,
+    tuning=<span class="string">"pythagorean"</span>
+)
+
+<span class="comment"># Custom tuning (cents offset from 12-TET)</span>
+custom_tuning = {
+    <span class="string">'C'</span>: <span class="number">0</span>,
+    <span class="string">'C#'</span>: <span class="number">-10</span>,
+    <span class="string">'D'</span>: <span class="number">4</span>,
+    <span class="string">'D#'</span>: <span class="number">-6</span>,
+    <span class="string">'E'</span>: <span class="number">-14</span>,
+    <span class="string">'F'</span>: <span class="number">-2</span>,
+    <span class="string">'F#'</span>: <span class="number">-12</span>,
+    <span class="string">'G'</span>: <span class="number">2</span>,
+    <span class="string">'G#'</span>: <span class="number">-8</span>,
+    <span class="string">'A'</span>: <span class="number">0</span>,
+    <span class="string">'A#'</span>: <span class="number">-4</span>,
+    <span class="string">'B'</span>: <span class="number">-12</span>
+}
+
+retune_midi(
+    input_file=<span class="string">"melody.mid"</span>,
+    output_file=<span class="string">"melody_custom.mid"</span>,
+    tuning=<span class="string">"custom"</span>,
+    custom_cents=custom_tuning
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Logarithmic Tunings -->
+                <section id="tunings">
+                    <h2>Logarithmic Tunings</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Exotic Tuning Systems</h3>
+                                    <span class="module-badge">midi.logarithmic_tunings</span>
+                                </div>
+                                <p class="module-desc">Generate frequency tables and MIDI mappings for non-standard equal temperaments.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>EDO (Equal Division of Octave) Systems</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>EDO</th>
+                                            <th>Step Size (cents)</th>
+                                            <th>Notable Intervals</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">12-EDO</span></td>
+                                            <td>100</td>
+                                            <td>Standard Western (reference)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">19-EDO</span></td>
+                                            <td>63.16</td>
+                                            <td>Better major thirds, minor sevenths</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">22-EDO</span></td>
+                                            <td>54.55</td>
+                                            <td>Excellent approximation of 7-limit intervals</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">24-EDO</span></td>
+                                            <td>50</td>
+                                            <td>Quarter tones (Arabic music)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">31-EDO</span></td>
+                                            <td>38.71</td>
+                                            <td>Near-just major/minor thirds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">41-EDO</span></td>
+                                            <td>29.27</td>
+                                            <td>Excellent fifth and third approximations</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">53-EDO</span></td>
+                                            <td>22.64</td>
+                                            <td>Very close to just intonation</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.midi.logarithmic_tunings <span class="keyword">import</span> (
+    generate_edo_frequencies,
+    create_midi_mapping,
+    cents_to_ratio
+)
+
+<span class="comment"># Generate 19-EDO frequency table</span>
+freqs_19 = generate_edo_frequencies(
+    divisions=<span class="number">19</span>,
+    base_freq=<span class="number">440</span>,  <span class="comment"># A4</span>
+    octaves=<span class="number">2</span>
+)
+<span class="keyword">print</span>(freqs_19)
+
+<span class="comment"># Create MIDI note mapping for 31-EDO</span>
+<span class="comment"># Maps 31 notes per octave to MIDI note numbers</span>
+mapping_31 = create_midi_mapping(
+    divisions=<span class="number">31</span>,
+    base_note=<span class="number">60</span>  <span class="comment"># Middle C</span>
+)
+
+<span class="comment"># Convert cents to frequency ratio</span>
+ratio = cents_to_ratio(<span class="number">386</span>)  <span class="comment"># Just major third</span>
+<span class="keyword">print</span>(f<span class="string">"Just major third ratio: {ratio:.4f}"</span>)  <span class="comment"># ~1.25</span>
+
+<span class="comment"># Generate Bohlen-Pierce scale (tritave-based)</span>
+<span class="keyword">from</span> audio_dsp.midi.logarithmic_tunings <span class="keyword">import</span> generate_bp_frequencies
+
+bp_freqs = generate_bp_frequencies(
+    base_freq=<span class="number">220</span>,
+    steps=<span class="number">13</span>  <span class="comment"># 13 steps per tritave (3:1)</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MIDI Tips -->
+                <section>
+                    <h2>MIDI Tips</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Working with MIDI</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="code-section">
+                                <h4>Basic MIDI Operations</h4>
+<pre><code><span class="keyword">import</span> mido
+
+<span class="comment"># Create a new MIDI file</span>
+mid = mido.MidiFile()
+track = mido.MidiTrack()
+mid.tracks.append(track)
+
+<span class="comment"># Add tempo (500000 microseconds = 120 BPM)</span>
+track.append(mido.MetaMessage(<span class="string">'set_tempo'</span>, tempo=<span class="number">500000</span>))
+
+<span class="comment"># Add notes</span>
+track.append(mido.Message(<span class="string">'note_on'</span>, note=<span class="number">60</span>, velocity=<span class="number">64</span>, time=<span class="number">0</span>))
+track.append(mido.Message(<span class="string">'note_off'</span>, note=<span class="number">60</span>, velocity=<span class="number">64</span>, time=<span class="number">480</span>))
+
+<span class="comment"># Save</span>
+mid.save(<span class="string">'output.mid'</span>)
+
+<span class="comment"># Read existing MIDI</span>
+mid = mido.MidiFile(<span class="string">'input.mid'</span>)
+<span class="keyword">for</span> track <span class="keyword">in</span> mid.tracks:
+    <span class="keyword">for</span> msg <span class="keyword">in</span> track:
+        <span class="keyword">if</span> msg.type == <span class="string">'note_on'</span>:
+            <span class="keyword">print</span>(f<span class="string">"Note: {msg.note}, Velocity: {msg.velocity}"</span>)</code></pre>
+                            </div>
+
+                            <div class="params-section" style="margin-top: 1.5rem;">
+                                <h4>MIDI Note Reference</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Note</th>
+                                            <th>MIDI #</th>
+                                            <th>Frequency (Hz)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>C2</td><td>36</td><td>65.41</td></tr>
+                                        <tr><td>C3</td><td>48</td><td>130.81</td></tr>
+                                        <tr><td>C4 (Middle C)</td><td>60</td><td>261.63</td></tr>
+                                        <tr><td>A4 (Concert A)</td><td>69</td><td>440.00</td></tr>
+                                        <tr><td>C5</td><td>72</td><td>523.25</td></tr>
+                                        <tr><td>C6</td><td>84</td><td>1046.50</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="toc">
+                <h4>On This Page</h4>
+                <ul>
+                    <li><a href="#polyrhythm">Polyrhythmic MIDI</a></li>
+                    <li><a href="#looper">MIDI Looper</a></li>
+                    <li><a href="#retune">MIDI Retuning</a></li>
+                    <li><a href="#tunings">Logarithmic Tunings</a></li>
+                </ul>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p>Python Audio DSP &mdash; Built with NumPy, SciPy, and SoundFile</p>
+        <p><a href="https://github.com/Metallicode/python_audio_dsp">View on GitHub</a></p>
+    </footer>
+</body>
+</html>

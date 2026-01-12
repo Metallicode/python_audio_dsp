@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "audio-dsp"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python audio DSP library for synthesis, effects, and sequencing"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.8"
 authors = [
-    {name = "dom"}
+    {name = "Dominique Grys"}
 ]
 keywords = ["audio", "dsp", "synthesis", "effects", "music", "signal-processing"]
 classifiers = [
@@ -27,7 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Multimedia :: Sound/Audio",
     "Topic :: Multimedia :: Sound/Audio :: Sound Synthesis",
-    "Topic :: Scientific/Engineering :: Signal Processing",
+    "Topic :: Scientific/Engineering",
 ]
 
 dependencies = [
@@ -69,9 +69,9 @@ audio = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dom/audio-dsp"
-Repository = "https://github.com/dom/audio-dsp"
-Issues = "https://github.com/dom/audio-dsp/issues"
+Homepage = "https://github.com/Metallicode/python_audio_dsp"
+Repository = "https://github.com/Metallicode/python_audio_dsp"
+Issues = "https://github.com/Metallicode/python_audio_dsp/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

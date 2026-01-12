@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Audio DSP - Documentation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">~</div>
+                <span>audio_dsp</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="synths.html">Synths</a></li>
+                <li><a href="effects.html">Effects</a></li>
+                <li><a href="utils.html">Utils</a></li>
+                <li><a href="sequencers.html">Sequencers</a></li>
+                <li><a href="midi.html">MIDI</a></li>
+            </ul>
+
+            <a href="https://github.com/Metallicode/python_audio_dsp" class="nav-github" target="_blank">
+                GitHub
+            </a>
+            <a href="https://buymeacoffee.com/metallicode?new=1" class="btn-support" target="_blank">Support</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <h1>Python Audio DSP</h1>
+            <p class="hero-subtitle">
+                A comprehensive Python library for audio synthesis, effects processing, and algorithmic composition.
+            </p>
+            <div class="hero-badges">
+                <span class="badge badge-synth"><span class="badge-icon"></span>14+ Synths</span>
+                <span class="badge badge-effects"><span class="badge-icon"></span>28+ Effects</span>
+                <span class="badge badge-utils"><span class="badge-icon"></span>8+ Utils</span>
+                <span class="badge badge-seq"><span class="badge-icon"></span>6+ Sequencers</span>
+                <span class="badge badge-midi"><span class="badge-icon"></span>MIDI Tools</span>
+            </div>
+        </section>
+
+        <section class="install-block">
+            <h3>Installation</h3>
+            <div class="install-options">
+                <div class="install-option">
+                    <span class="install-label">Core:</span>
+                    <code class="install-cmd">pip install audio_dsp</code>
+                </div>
+                <div class="install-option">
+                    <span class="install-label">Full (all extras):</span>
+                    <code class="install-cmd">pip install audio_dsp[full]</code>
+                </div>
+                <div class="install-option">
+                    <span class="install-label">Synth only:</span>
+                    <code class="install-cmd">pip install audio_dsp[synth]</code>
+                </div>
+                <div class="install-option">
+                    <span class="install-label">MIDI:</span>
+                    <code class="install-cmd">pip install audio_dsp[midi]</code>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Quick Start</h2>
+            <div class="module">
+                <div class="module-content">
+                    <div class="code-section">
+                        <h4>Basic Synthesis</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> SubtractiveSynth
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+<span class="comment"># Create a synth instance</span>
+synth = SubtractiveSynth(sample_rate=<span class="number">44100</span>)
+synth.osc_wave = <span class="string">"saw"</span>
+synth.filter_cutoff = <span class="number">800</span>
+synth.filter_resonance = <span class="number">2.0</span>
+
+<span class="comment"># Generate audio</span>
+audio = synth.synthesize(freq=<span class="number">220</span>, duration=<span class="number">2.0</span>)
+
+<span class="comment"># Save to file</span>
+sf.write(<span class="string">"output.wav"</span>, audio, <span class="number">44100</span>)</code></pre>
+                    </div>
+
+                    <div class="code-section">
+                        <h4>Apply Effects</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> fuzz_distortion, filter_effect
+
+<span class="comment"># Apply distortion</span>
+audio = fuzz_distortion(audio, gain=<span class="number">5.0</span>, mix=<span class="number">0.8</span>)
+
+<span class="comment"># Apply filter</span>
+audio = filter_effect(audio, cutoff=<span class="number">2000</span>, resonance=<span class="number">1.5</span>)</code></pre>
+                    </div>
+
+                    <div class="code-section">
+                        <h4>Drum Synthesis</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> DrumSynth
+
+drums = DrumSynth()
+kick = drums.kick(length=<span class="number">0.5</span>, max_pitch=<span class="number">1000</span>, min_pitch=<span class="number">50</span>)
+snare = drums.snare(length=<span class="number">0.3</span>, mix=<span class="number">0.5</span>)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Modules Overview</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon synth">~</div>
+                        <h3>Synthesizers</h3>
+                    </div>
+                    <p>Subtractive, FM (DX7), physical modeling, drums, pluck strings, speech synthesis, and chip-tune generators.</p>
+                    <a href="synths.html" class="card-link">View Synths &rarr;</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon effect">fx</div>
+                        <h3>Effects</h3>
+                    </div>
+                    <p>19 distortion types, filters, vocoders, compressors, delays, phasers, glitch effects, and spectral processors.</p>
+                    <a href="effects.html" class="card-link">View Effects &rarr;</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon util">fn</div>
+                        <h3>Utilities</h3>
+                    </div>
+                    <p>Scale generators, Arabic maqamat, spectral analysis, noise algorithms, transient extraction, and more.</p>
+                    <a href="utils.html" class="card-link">View Utils &rarr;</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon seq">[]</div>
+                        <h3>Sequencers</h3>
+                    </div>
+                    <p>Raga-based generators, Game of Life sequencers, text-to-music, non-linear/chaotic sequencing.</p>
+                    <a href="sequencers.html" class="card-link">View Sequencers &rarr;</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon midi">M</div>
+                        <h3>MIDI Tools</h3>
+                    </div>
+                    <p>Polyrhythmic MIDI generation, looping, retuning to alternative tuning systems, and exotic scales.</p>
+                    <a href="midi.html" class="card-link">View MIDI &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Featured Synthesizers</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon synth">~</div>
+                        <h3>SubtractiveSynth</h3>
+                    </div>
+                    <p>Classic subtractive synthesis with oscillators (sine, saw, square, triangle, PWM), ADSR envelope, resonant filter, and LFO modulation.</p>
+                    <a href="synths.html#subtractive" class="card-link">Learn more &rarr;</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon synth">~</div>
+                        <h3>DX7FMSynth</h3>
+                    </div>
+                    <p>Yamaha DX7-inspired FM synthesis with 4 operators, 5 algorithms, feedback, and per-operator ADSR envelopes.</p>
+                    <a href="synths.html#dx7" class="card-link">Learn more &rarr;</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon synth">~</div>
+                        <h3>DrumSynth</h3>
+                    </div>
+                    <p>Synthesize kicks, snares, cymbals, claps, rims, and toms with customizable pitch sweeps, decay, and layering.</p>
+                    <a href="synths.html#drums" class="card-link">Learn more &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Featured Effects</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon effect">fx</div>
+                        <h3>Distortion Suite</h3>
+                    </div>
+                    <p>19 distortion types including fuzz, overdrive, wavefold, bitcrush, asymmetric, Chebyshev, and fractal fold.</p>
+                    <a href="effects.html#distortion" class="card-link">Learn more &rarr;</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon effect">fx</div>
+                        <h3>Vocoder</h3>
+                    </div>
+                    <p>Classic vocoder with configurable filter banks, noise/sawtooth carriers, and spectral envelope modulation.</p>
+                    <a href="effects.html#vocoder" class="card-link">Learn more &rarr;</a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon effect">fx</div>
+                        <h3>Glitch Machine</h3>
+                    </div>
+                    <p>Segment-based glitch processor with retrigger, pitch shift, reverse, quantize, and ring modulation.</p>
+                    <a href="effects.html#glitch" class="card-link">Learn more &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Dependencies</h2>
+            <div class="module">
+                <div class="module-content">
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Package</th>
+                                <th>Required For</th>
+                                <th>Install Extra</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="param-name">numpy</span></td>
+                                <td>Core (always required)</td>
+                                <td><span class="param-default">included</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="param-name">scipy</span></td>
+                                <td>Core (always required)</td>
+                                <td><span class="param-default">included</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="param-name">soundfile</span></td>
+                                <td>Core (always required)</td>
+                                <td><span class="param-default">included</span></td>
+                            </tr>
+                            <tr>
+                                <td><span class="param-name">librosa</span></td>
+                                <td>Vocoder, phaser, glitch, time-stretch</td>
+                                <td><code>[full]</code> or <code>[synth]</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="param-name">mido</span></td>
+                                <td>MIDI processing</td>
+                                <td><code>[midi]</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="param-name">simpleaudio</span></td>
+                                <td>Real-time playback</td>
+                                <td><code>[audio]</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="param-name">matplotlib</span></td>
+                                <td>Visualization</td>
+                                <td><code>[viz]</code></td>
+                            </tr>
+                            <tr>
+                                <td><span class="param-name">PIL/Pillow</span></td>
+                                <td>Image processing effects</td>
+                                <td><code>[full]</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Python Audio DSP &mdash; Built with NumPy, SciPy, and SoundFile</p>
+        <p><a href="https://github.com/Metallicode/python_audio_dsp">View on GitHub</a></p>
+        <p>Dominique Grys - Metallicode ltd 2026</p>
+    </footer>
+</body>
+</html>

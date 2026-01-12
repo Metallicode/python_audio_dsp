@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synthesizers - Python Audio DSP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo-icon">~</div>
+                <span>audio_dsp</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="synths.html" class="active">Synths</a></li>
+                <li><a href="effects.html">Effects</a></li>
+                <li><a href="utils.html">Utils</a></li>
+                <li><a href="sequencers.html">Sequencers</a></li>
+                <li><a href="midi.html">MIDI</a></li>
+            </ul>
+            <a href="https://github.com/Metallicode/python_audio_dsp" class="nav-github" target="_blank">
+                GitHub
+            </a>
+            <a href="https://buymeacoffee.com/metallicode?new=1" class="btn-support" target="_blank">Support</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="two-col">
+            <div>
+                <header class="page-header">
+                    <h1>Synthesizers</h1>
+                    <p>Generate audio from oscillators, FM synthesis, physical modeling, and more.</p>
+                </header>
+
+                <div class="quick-links">
+                    <a href="#subtractive" class="quick-link">SubtractiveSynth</a>
+                    <a href="#dx7" class="quick-link">DX7FMSynth</a>
+                    <a href="#superstacked" class="quick-link">SuperStackedSynth</a>
+                    <a href="#drums" class="quick-link">DrumSynth</a>
+                    <a href="#pluck" class="quick-link">PluckSynth</a>
+                    <a href="#physical" class="quick-link">PhysicalModeling</a>
+                    <a href="#dialup" class="quick-link">DialupSynth</a>
+                    <a href="#chiptone" class="quick-link">ChipTone</a>
+                </div>
+
+                <!-- SubtractiveSynth -->
+                <section id="subtractive">
+                    <h2>SubtractiveSynth</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>SubtractiveSynth</h3>
+                                    <span class="module-badge">Core</span>
+                                </div>
+                                <p class="module-desc">Classic subtractive synthesis with oscillators, filters, ADSR envelope, and LFO modulation.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Constructor Parameters</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">sample_rate</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">44100</span></td>
+                                            <td>Audio sample rate in Hz</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="params-section">
+                                <h4>Oscillator Properties</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Property</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">osc_wave</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">"sine"</span></td>
+                                            <td>Waveform: "sine", "square", "saw", "triangle", "pwm", "wavetable"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">pwm_depth</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>Pulse width for PWM waveform (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">wavetable</span></td>
+                                            <td><span class="param-type">np.array</span></td>
+                                            <td><span class="param-default">None</span></td>
+                                            <td>Custom wavetable array for "wavetable" mode</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="params-section">
+                                <h4>ADSR Envelope Properties</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Property</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">attack</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.01</span></td>
+                                            <td>Attack time in seconds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">decay</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.1</span></td>
+                                            <td>Decay time in seconds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">sustain</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.7</span></td>
+                                            <td>Sustain level (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">release</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.2</span></td>
+                                            <td>Release time in seconds</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="params-section">
+                                <h4>Filter Properties</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Property</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">filter_type</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">"lowpass"</span></td>
+                                            <td>"lowpass", "highpass", or "bandpass"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">filter_cutoff</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">1000</span></td>
+                                            <td>Cutoff frequency in Hz (50-5000)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">filter_resonance</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.7</span></td>
+                                            <td>Resonance amount (0-5)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">filter_q</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">1.0</span></td>
+                                            <td>Q factor (0.1-10)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="params-section">
+                                <h4>LFO Properties</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Property</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">lfo_freq</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">5.0</span></td>
+                                            <td>LFO frequency in Hz</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">lfo_depth</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.2</span></td>
+                                            <td>LFO modulation depth (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">lfo_target</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">"filter"</span></td>
+                                            <td>"filter", "pitch", or "amplitude"</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> SubtractiveSynth
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+<span class="comment"># Create synth with sawtooth oscillator</span>
+synth = SubtractiveSynth(sample_rate=<span class="number">44100</span>)
+synth.osc_wave = <span class="string">"saw"</span>
+
+<span class="comment"># Configure filter</span>
+synth.filter_type = <span class="string">"lowpass"</span>
+synth.filter_cutoff = <span class="number">800</span>
+synth.filter_resonance = <span class="number">2.0</span>
+
+<span class="comment"># Configure envelope</span>
+synth.attack = <span class="number">0.05</span>
+synth.decay = <span class="number">0.2</span>
+synth.sustain = <span class="number">0.6</span>
+synth.release = <span class="number">0.5</span>
+
+<span class="comment"># Add LFO modulation to filter</span>
+synth.lfo_target = <span class="string">"filter"</span>
+synth.lfo_freq = <span class="number">3.0</span>
+synth.lfo_depth = <span class="number">0.4</span>
+
+<span class="comment"># Synthesize a note</span>
+audio = synth.synthesize(freq=<span class="number">220</span>, duration=<span class="number">2.0</span>)
+sf.write(<span class="string">"subtractive_synth.wav"</span>, audio, <span class="number">44100</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DX7FMSynth -->
+                <section id="dx7">
+                    <h2>DX7FMSynth</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>DX7FMSynth</h3>
+                                    <span class="module-badge">Core</span>
+                                </div>
+                                <p class="module-desc">Yamaha DX7-inspired FM synthesis with 4 operators, 5 algorithms, and per-operator envelopes.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Constructor / Properties</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Property</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">algorithm</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">1</span></td>
+                                            <td>FM algorithm (1-5)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">freq_ratios</span></td>
+                                            <td><span class="param-type">list[float]</span></td>
+                                            <td><span class="param-default">[1.0, 2.0, 1.0, 0.5]</span></td>
+                                            <td>Frequency ratio for each of 4 operators</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">mod_indices</span></td>
+                                            <td><span class="param-type">list[float]</span></td>
+                                            <td><span class="param-default">[1.0, 1.0, 1.0, 1.0]</span></td>
+                                            <td>Modulation index for each operator</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">feedback</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.0</span></td>
+                                            <td>Op4 feedback amount (0-5)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">adsr</span></td>
+                                            <td><span class="param-type">list[dict]</span></td>
+                                            <td><span class="param-default">see below</span></td>
+                                            <td>ADSR envelope per operator</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="params-section">
+                                <h4>FM Algorithms</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Algorithm</th>
+                                            <th>Structure</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">1</span></td>
+                                            <td>Op4 &rarr; Op3 &rarr; Op2 &rarr; Op1</td>
+                                            <td>Linear carrier chain</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">2</span></td>
+                                            <td>(Op4 &rarr; Op3) + (Op2 &rarr; Op1)</td>
+                                            <td>Two parallel chains mixed</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">3</span></td>
+                                            <td>(Op4 + Op3) &rarr; Op2 &rarr; Op1</td>
+                                            <td>Dual modulators into chain</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">4</span></td>
+                                            <td>Op4 &rarr; (Op3 + Op2) &rarr; Op1</td>
+                                            <td>Split modulation</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">5</span></td>
+                                            <td>Op4 + Op3 + Op2 + Op1</td>
+                                            <td>All operators independent (additive)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> DX7FMSynth
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+<span class="comment"># Create FM synth</span>
+synth = DX7FMSynth()
+
+<span class="comment"># Configure operator ratios (harmonic series)</span>
+synth.freq_ratios = [<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>]
+
+<span class="comment"># Set modulation indices</span>
+synth.mod_indices = [<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">1.5</span>, <span class="number">0.5</span>]
+
+<span class="comment"># Add feedback for richness</span>
+synth.feedback = <span class="number">1.0</span>
+
+<span class="comment"># Synthesize with algorithm 3</span>
+audio = synth.synthesize(freq=<span class="number">110</span>, duration=<span class="number">2.0</span>, algorithm=<span class="number">3</span>)
+sf.write(<span class="string">"fm_synth.wav"</span>, audio, <span class="number">44100</span>)
+
+<span class="comment"># Electric piano style</span>
+synth.freq_ratios = [<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">7.0</span>, <span class="number">14.0</span>]
+synth.mod_indices = [<span class="number">1.0</span>, <span class="number">0.5</span>, <span class="number">2.0</span>, <span class="number">1.0</span>]
+audio = synth.synthesize(freq=<span class="number">440</span>, duration=<span class="number">1.5</span>, algorithm=<span class="number">2</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SuperStackedSynth -->
+                <section id="superstacked">
+                    <h2>SuperStackedSynth</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>SuperStackedSynth</h3>
+                                    <span class="module-badge">Core</span>
+                                </div>
+                                <p class="module-desc">Massive unison synth with up to 10,000 detuned oscillators for huge, lush sounds.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Synthesize Parameters</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">base_freq</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Central frequency in Hz</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">duration</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Length in seconds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">num_oscillators</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">100</span></td>
+                                            <td>Number of oscillators (1-10000)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">detune_spread</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.02</span></td>
+                                            <td>Max detune amount (0.02 = &plusmn;2%)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">wave_mix</span></td>
+                                            <td><span class="param-type">dict</span></td>
+                                            <td><span class="param-default">equal mix</span></td>
+                                            <td>Waveform weights {"sine": 1, "saw": 1, ...}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">fade_in_time</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.1</span></td>
+                                            <td>Staggered fade-in per oscillator</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">output_file</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">"super_synth.wav"</span></td>
+                                            <td>Output file path</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> SuperStackedSynth
+
+synth = SuperStackedSynth()
+
+<span class="comment"># Massive pad sound</span>
+synth.synthesize(
+    base_freq=<span class="number">220</span>,
+    duration=<span class="number">5.0</span>,
+    num_oscillators=<span class="number">200</span>,
+    detune_spread=<span class="number">0.03</span>,
+    wave_mix={<span class="string">"saw"</span>: <span class="number">1.0</span>, <span class="string">"square"</span>: <span class="number">0.3</span>},
+    output_file=<span class="string">"massive_pad.wav"</span>
+)
+
+<span class="comment"># Subtle chorus effect</span>
+synth.synthesize(
+    base_freq=<span class="number">440</span>,
+    duration=<span class="number">3.0</span>,
+    num_oscillators=<span class="number">20</span>,
+    detune_spread=<span class="number">0.005</span>,
+    wave_mix={<span class="string">"sine"</span>: <span class="number">1.0</span>},
+    output_file=<span class="string">"subtle_chorus.wav"</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DrumSynth -->
+                <section id="drums">
+                    <h2>DrumSynth</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>DrumSynth</h3>
+                                    <span class="module-badge">Core</span>
+                                </div>
+                                <p class="module-desc">Synthesize kicks, snares, cymbals, claps, rims, and toms with pitch sweeps and layering.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <details open>
+                                <summary>kick()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">length</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.5</span></td>
+                                                <td>Duration in seconds</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">max_pitch</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">1000</span></td>
+                                                <td>Starting pitch in Hz</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">min_pitch</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">50</span></td>
+                                                <td>Ending pitch in Hz</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">decay_factor</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">10</span></td>
+                                                <td>Amplitude decay speed</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">signal_mix</span></td>
+                                                <td><span class="param-type">str</span></td>
+                                                <td><span class="param-default">"sine:1.0"</span></td>
+                                                <td>Waveform mix "sine:1.0,fm:0.3"</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>snare()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">length</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.3</span></td>
+                                                <td>Duration in seconds</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">high_pitch</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">300</span></td>
+                                                <td>High tone frequency</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">low_pitch</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">150</span></td>
+                                                <td>Low tone frequency</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">mix</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.5</span></td>
+                                                <td>Noise vs tone balance (0-1)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">signal_mix</span></td>
+                                                <td><span class="param-type">str</span></td>
+                                                <td><span class="param-default">"sine:1.0"</span></td>
+                                                <td>Waveform mix for tone</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>cymbal()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">length</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">1.0</span></td>
+                                                <td>Duration in seconds</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">op_a_freq</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">587</span></td>
+                                                <td>FM operator A frequency</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">op_b_freq</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">845</span></td>
+                                                <td>FM operator B frequency</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">noise_env</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">5</span></td>
+                                                <td>Noise decay envelope</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">tone_env</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">10</span></td>
+                                                <td>Tone decay envelope</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">cutoff</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">8000</span></td>
+                                                <td>Filter cutoff Hz</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">mix</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.5</span></td>
+                                                <td>Noise/tone mix (0-1)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>clap()</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">length</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.3</span></td>
+                                                <td>Duration in seconds</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">pitch</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">1000</span></td>
+                                                <td>Tone frequency</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">burst_count</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td><span class="param-default">3</span></td>
+                                                <td>Number of burst hits</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">noise_mix</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">0.8</span></td>
+                                                <td>Noise/tone mix (0-1)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>tom() / rim()</summary>
+                                <div>
+                                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">Similar parameters to kick/snare with pitch sweep and noise mix controls.</p>
+                                </div>
+                            </details>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> DrumSynth
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+drums = DrumSynth()
+
+<span class="comment"># Create a punchy kick</span>
+kick = drums.kick(
+    length=<span class="number">0.5</span>,
+    max_pitch=<span class="number">800</span>,
+    min_pitch=<span class="number">40</span>,
+    decay_factor=<span class="number">15</span>,
+    signal_mix=<span class="string">"sine:1.0,fm:0.2"</span>
+)
+
+<span class="comment"># Crispy snare</span>
+snare = drums.snare(
+    length=<span class="number">0.25</span>,
+    high_pitch=<span class="number">350</span>,
+    low_pitch=<span class="number">180</span>,
+    mix=<span class="number">0.6</span>
+)
+
+<span class="comment"># Hi-hat cymbal</span>
+hihat = drums.cymbal(
+    length=<span class="number">0.15</span>,
+    cutoff=<span class="number">10000</span>,
+    mix=<span class="number">0.3</span>
+)
+
+<span class="comment"># Combine into a pattern</span>
+pattern = np.concatenate([kick, snare, hihat, hihat])
+sf.write(<span class="string">"drum_pattern.wav"</span>, pattern, <span class="number">44100</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PluckSynth -->
+                <section id="pluck">
+                    <h2>Pluck Synth (Karplus-Strong)</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>generate_string_pluck</h3>
+                                    <span class="module-badge">synth.pluck</span>
+                                </div>
+                                <p class="module-desc">Physical modeling string synthesis using Karplus-Strong algorithm with extended parameters.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Parameters</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">length</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Duration in seconds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">frequency</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Note frequency in Hz</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">intensity</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">1.0</span></td>
+                                            <td>Pluck amplitude</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">damping</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>0=bright, 1=dark (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">brightness</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>Filter brightness (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">mute_strength</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>Palm muting amount (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">pitch_bend</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>Pitch envelope amount (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">pluck_position</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>Position along string (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">plectrum_size</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>Pick size (0=small, 1=large)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth.pluck <span class="keyword">import</span> generate_string_pluck
+
+<span class="comment"># Bright acoustic guitar pluck</span>
+generate_string_pluck(
+    output_file=<span class="string">"guitar_pluck.wav"</span>,
+    length=<span class="number">2.0</span>,
+    frequency=<span class="number">329.63</span>,  <span class="comment"># E4</span>
+    damping=<span class="number">0.3</span>,
+    brightness=<span class="number">0.7</span>,
+    pluck_position=<span class="number">0.2</span>
+)
+
+<span class="comment"># Muted bass string</span>
+generate_string_pluck(
+    output_file=<span class="string">"bass_muted.wav"</span>,
+    length=<span class="number">1.0</span>,
+    frequency=<span class="number">82.41</span>,  <span class="comment"># E2</span>
+    damping=<span class="number">0.7</span>,
+    mute_strength=<span class="number">0.8</span>,
+    plectrum_size=<span class="number">0.8</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PhysicalModelingSynth -->
+                <section id="physical">
+                    <h2>Physical Modeling Synth</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>PhysicalModelingSynth</h3>
+                                    <span class="module-badge">synth.physical_modeling_synth</span>
+                                </div>
+                                <p class="module-desc">Excite spectral models with extracted transients for realistic instrument synthesis.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Parameters</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">frequency</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Target frequency in Hz</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">length</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Duration in seconds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">transient_file</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Path to .transient JSON file</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">spectral_file</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Path to .spectral JSON file</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">decay_rate</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>Body resonance decay speed</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DialupSynth -->
+                <section id="dialup">
+                    <h2>Dialup Modem Synth</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>generate_56k_dialup</h3>
+                                    <span class="module-badge">synth.dialup_synth</span>
+                                </div>
+                                <p class="module-desc">Generate randomized 56k modem handshake sounds with authentic phases.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Parameters</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">filename</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">"56k_dialup_random.wav"</span></td>
+                                            <td>Output file path</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">duration</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">8.0</span></td>
+                                            <td>Total duration in seconds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">sample_rate</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">44100</span></td>
+                                            <td>Sample rate in Hz</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth.dialup_synth <span class="keyword">import</span> generate_56k_dialup
+
+<span class="comment"># Generate nostalgic dialup sounds</span>
+generate_56k_dialup(
+    filename=<span class="string">"dialup.wav"</span>,
+    duration=<span class="number">10.0</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ChipTone -->
+                <section id="chiptone">
+                    <h2>Chip Tone Synths</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>ChipTone</h3>
+                                    <span class="module-badge">synth.chip_tone</span>
+                                </div>
+                                <p class="module-desc">8-bit retro chiptune synthesis with square waves, arpeggiation, and classic game sounds.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.synth.chip_tone <span class="keyword">import</span> ChipTone
+
+chip = ChipTone()
+
+<span class="comment"># Generate 8-bit melody</span>
+chip.generate_melody(
+    notes=[<span class="number">440</span>, <span class="number">523</span>, <span class="number">587</span>, <span class="number">659</span>],
+    durations=[<span class="number">0.2</span>, <span class="number">0.2</span>, <span class="number">0.2</span>, <span class="number">0.4</span>],
+    output_file=<span class="string">"chiptune.wav"</span>
+)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="toc">
+                <h4>On This Page</h4>
+                <ul>
+                    <li><a href="#subtractive">SubtractiveSynth</a></li>
+                    <li><a href="#dx7">DX7FMSynth</a></li>
+                    <li><a href="#superstacked">SuperStackedSynth</a></li>
+                    <li><a href="#drums">DrumSynth</a></li>
+                    <li><a href="#pluck">Pluck Synth</a></li>
+                    <li><a href="#physical">Physical Modeling</a></li>
+                    <li><a href="#dialup">Dialup Synth</a></li>
+                    <li><a href="#chiptone">Chip Tone</a></li>
+                </ul>
+            </aside>
+        </div>
+    </main>
+
+    <footer>
+        <p>Python Audio DSP &mdash; Built with NumPy, SciPy, and SoundFile</p>
+        <p><a href="https://github.com/Metallicode/python_audio_dsp">View on GitHub</a></p>
+    </footer>
+</body>
+</html>
