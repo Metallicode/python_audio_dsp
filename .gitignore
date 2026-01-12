@@ -30,3 +30,9 @@ venv/
 
 # Include impulse response files
 !audio_dsp/effects/impulse_response/*
+# Build artifacts
+dist/
+build/
+*.egg-info/
+__pycache__/
+*.pyc
