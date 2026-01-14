@@ -1,5 +1,4 @@
 import numpy as np
-import noise
 import wave
 
 # Noise Algorithms
@@ -56,10 +55,12 @@ def perlin_noise(length, sample_rate=44100, octaves=1, persistence=0.5, lacunari
     Generate Perlin noise with an adjustable frequency.
     Parameters:
     - frequency: Controls the perceived frequency of the noise (higher = faster changes).
+    Requires: pip install noise
     """
+    import noise  # Lazy import for optional dependency
     num_samples = int(length * sample_rate)
     _noise = np.zeros(num_samples)
-    
+
     # Scale input to pnoise1 by the frequency multiplier
     for i in range(num_samples):
         _noise[i] = noise.pnoise1(i * frequency / sample_rate, octaves=octaves, persistence=persistence, lacunarity=lacunarity)
@@ -76,10 +77,12 @@ def simplex_noise(length, sample_rate=44100, octaves=1, persistence=0.5, lacunar
     Generate Simplex noise using snoise2 with one dimension fixed.
     Parameters:
     - frequency: Controls the perceived frequency of the noise (higher = faster changes).
+    Requires: pip install noise
     """
+    import noise  # Lazy import for optional dependency
     num_samples = int(length * sample_rate)
     _noise = np.zeros(num_samples)
-    
+
     # Use snoise2 with y fixed at 0 to simulate 1D Simplex noise
     for i in range(num_samples):
         _noise[i] = noise.snoise2(i * frequency / sample_rate, 0, octaves=octaves, persistence=persistence, lacunarity=lacunarity)

@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.io import wavfile
-import matplotlib.pyplot as plt
 from scipy.signal import stft, istft
 
 SAMPLE_RATE = 44100
@@ -171,6 +170,7 @@ def generate_transfer_function(distortion_func, *args, input_range=(-1, 1), poin
     return x, y
 
 def plot_effects(input_signal, output_signal, distortion_name, transfer_x, transfer_y, *args):
+    import matplotlib.pyplot as plt  # Lazy import for optional dependency
     t = np.linspace(0, 1, SAMPLE_RATE)
     sine = np.sin(2 * np.pi * 1 * t)
     distorted_sine = globals()[f"{distortion_name.lower()}_distortion"](sine, *args)

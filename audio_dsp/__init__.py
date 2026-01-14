@@ -7,7 +7,7 @@ Import specific modules as needed:
     from audio_dsp.effects import filter_effect
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.3"
 
 __all__ = ["synth", "effects", "sequencer", "midi", "utils", "__version__"]
 

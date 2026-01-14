@@ -58,12 +58,36 @@ class SubtractiveSynth:
         release_samples = int(release * self.sample_rate)
         sustain_level = sustain
 
+        # Scale ADSR stages if they exceed total duration
+        total_adsr = attack_samples + decay_samples + release_samples
+        if total_adsr > total_samples:
+            scale = total_samples / total_adsr
+            attack_samples = int(attack_samples * scale)
+            decay_samples = int(decay_samples * scale)
+            release_samples = int(release_samples * scale)
+
         envelope = np.ones(total_samples)
-        envelope[:attack_samples] = np.linspace(0, 1, attack_samples)
-        envelope[attack_samples:attack_samples + decay_samples] = np.linspace(1, sustain_level, decay_samples)
-        sustain_end = total_samples - release_samples
-        envelope[attack_samples + decay_samples:sustain_end] = sustain_level
-        envelope[sustain_end:] = np.linspace(sustain_level, 0, release_samples)
+
+        # Attack phase
+        if attack_samples > 0:
+            envelope[:attack_samples] = np.linspace(0, 1, attack_samples)
+
+        # Decay phase
+        decay_end = min(attack_samples + decay_samples, total_samples)
+        actual_decay = decay_end - attack_samples
+        if actual_decay > 0:
+            envelope[attack_samples:decay_end] = np.linspace(1, sustain_level, actual_decay)
+
+        # Sustain phase
+        sustain_end = max(0, total_samples - release_samples)
+        if sustain_end > decay_end:
+            envelope[decay_end:sustain_end] = sustain_level
+
+        # Release phase
+        if release_samples > 0 and sustain_end < total_samples:
+            actual_release = total_samples - sustain_end
+            envelope[sustain_end:] = np.linspace(sustain_level, 0, actual_release)
+
         return signal * envelope
 
     def apply_filter(self, signal, cutoff, resonance, q, filter_type="lowpass"):

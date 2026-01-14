@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.io import wavfile
 from scipy.signal import butter, sosfiltfilt
-import matplotlib.pyplot as plt
 import os
 
 def create_negative_waveform(input_signal):
@@ -69,8 +68,9 @@ def sidechain_compressor(input_signal, control_signal, fs, threshold=0.2, ratio=
 
 def visualize_waveforms(input_signal, negative_signal, compressed_signal, gain_signal, control_signal, fs):
     """Plot input, negative, compressed, gain, and control waveforms."""
+    import matplotlib.pyplot as plt  # Lazy import for optional dependency
     time = np.arange(len(input_signal)) / fs
-    
+
     plt.figure(figsize=(12, 20))
     
     plt.subplot(5, 1, 1)
@@ -120,12 +120,13 @@ def visualize_waveforms(input_signal, negative_signal, compressed_signal, gain_s
 
 def visualize_spectrum(input_signal, negative_signal, compressed_signal, fs):
     """Plot input, negative, and compressed spectra."""
+    import matplotlib.pyplot as plt  # Lazy import for optional dependency
     n = len(input_signal)
     freq = np.fft.rfftfreq(n, 1 / fs)
     input_spec = 20 * np.log10(np.abs(np.fft.rfft(input_signal)) + 1e-10)
     negative_spec = 20 * np.log10(np.abs(np.fft.rfft(negative_signal)) + 1e-10)
     compressed_spec = 20 * np.log10(np.abs(np.fft.rfft(compressed_signal)) + 1e-10)
-    
+
     plt.figure(figsize=(12, 6))
     plt.plot(freq, input_spec, label='Input Spectrum')
     plt.plot(freq, negative_spec, label='Negative Spectrum', linestyle='--')

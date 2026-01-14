@@ -26,7 +26,7 @@ pip install audio-dsp[audio]   # Extended audio processing (librosa, pydub)
 - **DX7FMSynth** - DX7-style FM synthesis with 4 operators and 5 algorithms
 - **PhysicalModelingSynth** - Physical modeling synthesis
 - **DrumSynth** - Drum synthesis
-- **ChipTone** - Retro 8-bit chip synthesis
+- **ChipTone functions** - Retro 8-bit chip synthesis (kick, snare, blip, etc.)
 - **PluckSynth** - Karplus-Strong plucked string synthesis
 - **DialupSynth** - Modem/dial-up sound synthesis
 
@@ -81,7 +81,7 @@ sf.write("output.wav", audio, 44100)
 ```
 
 ```python
-from audio_dsp.effects import Vocoder
+from audio_dsp.effects import vocoder
 import librosa
 
 # Load audio
@@ -89,8 +89,7 @@ carrier, sr = librosa.load("carrier.wav", sr=44100)
 modulator, _ = librosa.load("modulator.wav", sr=44100)
 
 # Apply vocoder effect
-vocoder = Vocoder(sample_rate=sr)
-output = vocoder.process(carrier, modulator)
+output = vocoder(carrier, modulator, sr, num_bands=16)
 ```
 
 ## License
