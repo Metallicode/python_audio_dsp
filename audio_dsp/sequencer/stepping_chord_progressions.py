@@ -140,8 +140,6 @@ import numpy as np
 from scipy.io import wavfile
 import time
 
-print("Script started")
-
 # Audio parameters
 SAMPLE_RATE = 44100  # Hz
 FADE_DURATION = 0.02  # 20 ms fade in/out
@@ -233,57 +231,58 @@ def generate_full_audio(progression, bpm):
     
     return (audio_data * 32767).astype(np.int16)
 
-try:
-    print("Getting inputs")
-    bpm = float(input("Enter tempo in BPM (e.g., 120): "))
-    root_note = input("Enter root note (e.g., C, G#, A): ").upper()
-    root_octave = int(input("Enter root octave (e.g., 4 for C4): "))
-    steps_per_octave = int(input("Enter steps per octave (e.g., 24 for quarter tones): "))
-    
-    mode_choice = input("Enter 'preset' for predefined mode or 'custom' for custom steps: ").lower()
-    if mode_choice == 'preset':
-        mode = input("Enter mode (micro_ionian, micro_dorian, micro_phrygian, micro_lydian, micro_mixolydian, micro_aeolian, micro_locrian, micro_harmonic_minor, micro_melodic_minor, phrygian_dominant, quarter_tone, micro_blues): ").lower()
-        if mode not in MICROTONAL_MODES:
-            raise ValueError("Invalid preset mode")
-        mode_steps = MICROTONAL_MODES[mode]
-    else:
-        step_input = input("Enter mode steps as space-separated numbers (e.g., 4 2 4 4 4 2 4): ")
-        mode_steps = [int(x) for x in step_input.split()]
-        if not mode_steps:
-            raise ValueError("Mode steps list cannot be empty")
-    
-    notes_per_chord = int(input("Enter number of notes per chord (e.g., 3 for triad, 4 for seventh): "))
-    start_num = int(input("Enter starting number (e.g., 1): "))
-    step_input = input("Enter step sizes as space-separated numbers (e.g., 2 45 3): ")
-    step_sizes = [int(x) for x in step_input.split()]
-    num_steps = int(input("Enter number of steps (e.g., 40): "))
+if __name__ == "__main__":
+    try:
+        print("Getting inputs")
+        bpm = float(input("Enter tempo in BPM (e.g., 120): "))
+        root_note = input("Enter root note (e.g., C, G#, A): ").upper()
+        root_octave = int(input("Enter root octave (e.g., 4 for C4): "))
+        steps_per_octave = int(input("Enter steps per octave (e.g., 24 for quarter tones): "))
 
-    print("Validating inputs")
-    if not step_sizes:
-        raise ValueError("Step sizes list cannot be empty")
-    if root_note not in NOTE_NAMES or (mode_choice == 'preset' and mode not in MICROTONAL_MODES) or notes_per_chord < 1:
-        raise ValueError("Invalid input")
+        mode_choice = input("Enter 'preset' for predefined mode or 'custom' for custom steps: ").lower()
+        if mode_choice == 'preset':
+            mode = input("Enter mode (micro_ionian, micro_dorian, micro_phrygian, micro_lydian, micro_mixolydian, micro_aeolian, micro_locrian, micro_harmonic_minor, micro_melodic_minor, phrygian_dominant, quarter_tone, micro_blues): ").lower()
+            if mode not in MICROTONAL_MODES:
+                raise ValueError("Invalid preset mode")
+            mode_steps = MICROTONAL_MODES[mode]
+        else:
+            step_input = input("Enter mode steps as space-separated numbers (e.g., 4 2 4 4 4 2 4): ")
+            mode_steps = [int(x) for x in step_input.split()]
+            if not mode_steps:
+                raise ValueError("Mode steps list cannot be empty")
 
-    print("Calculating root frequency")
-    root_idx = NOTE_NAMES.index(root_note)
-    root_freq = 440.0 * (2 ** ((root_idx - 9) / 12)) * (2 ** (root_octave - 4))
+        notes_per_chord = int(input("Enter number of notes per chord (e.g., 3 for triad, 4 for seventh): "))
+        start_num = int(input("Enter starting number (e.g., 1): "))
+        step_input = input("Enter step sizes as space-separated numbers (e.g., 2 45 3): ")
+        step_sizes = [int(x) for x in step_input.split()]
+        num_steps = int(input("Enter number of steps (e.g., 40): "))
 
-    start_time = time.time()
-    scale = generate_scale(root_freq, steps_per_octave, mode_steps)
-    progression = generate_progression(start_num, step_sizes, num_steps, scale, notes_per_chord)
-    print(f"Setup time: {time.time() - start_time:.2f} seconds")
+        print("Validating inputs")
+        if not step_sizes:
+            raise ValueError("Step sizes list cannot be empty")
+        if root_note not in NOTE_NAMES or (mode_choice == 'preset' and mode not in MICROTONAL_MODES) or notes_per_chord < 1:
+            raise ValueError("Invalid input")
 
-    print("Generating audio")
-    start_time = time.time()
-    audio_data = generate_full_audio(progression, bpm)
-    print(f"Audio generation time: {time.time() - start_time:.2f} seconds")
+        print("Calculating root frequency")
+        root_idx = NOTE_NAMES.index(root_note)
+        root_freq = 440.0 * (2 ** ((root_idx - 9) / 12)) * (2 ** (root_octave - 4))
 
-    print("Writing file")
-    start_time = time.time()
-    wavfile.write("microtonal_progression.wav", SAMPLE_RATE, audio_data)
-    print(f"File write time: {time.time() - start_time:.2f} seconds")
+        start_time = time.time()
+        scale = generate_scale(root_freq, steps_per_octave, mode_steps)
+        progression = generate_progression(start_num, step_sizes, num_steps, scale, notes_per_chord)
+        print(f"Setup time: {time.time() - start_time:.2f} seconds")
 
-except ValueError as e:
-    print(f"Error: {e}")
-except Exception as e:
-    print(f"An unexpected error occurred: {e}")
+        print("Generating audio")
+        start_time = time.time()
+        audio_data = generate_full_audio(progression, bpm)
+        print(f"Audio generation time: {time.time() - start_time:.2f} seconds")
+
+        print("Writing file")
+        start_time = time.time()
+        wavfile.write("microtonal_progression.wav", SAMPLE_RATE, audio_data)
+        print(f"File write time: {time.time() - start_time:.2f} seconds")
+
+    except ValueError as e:
+        print(f"Error: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")

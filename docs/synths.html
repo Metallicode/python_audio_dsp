@@ -1009,18 +1009,75 @@ generate_56k_dialup(
                             </div>
                         </div>
                         <div class="module-content">
+                            <div class="params-section">
+                                <h4>Available Functions</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Function</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">generate_kick()</span></td>
+                                            <td>Low-frequency decaying square wave with random frequency range</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">generate_snare()</span></td>
+                                            <td>Noise with a short square wave, random balance and decay</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">generate_cymbal()</span></td>
+                                            <td>High-frequency noise with random decay and filter</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">generate_blip()</span></td>
+                                            <td>Short high-pitched square wave with random pitch</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">generate_swoosh()</span></td>
+                                            <td>Sweeping square wave with random frequency range</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">generate_fast_arp()</span></td>
+                                            <td>Fast up/down arpeggio with random note selection</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">generate_random_arp()</span></td>
+                                            <td>Random frequency jumps with random note count</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">generate_pop()</span></td>
+                                            <td>Short, sharp square wave with random pitch</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.synth.chip_tone <span class="keyword">import</span> ChipTone
+<pre><code><span class="keyword">from</span> audio_dsp.synth.chip_tone <span class="keyword">import</span> (
+    generate_kick,
+    generate_snare,
+    generate_cymbal,
+    generate_blip
+)
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy.io <span class="keyword">import</span> wavfile
 
-chip = ChipTone()
+<span class="comment"># Generate individual 8-bit sounds</span>
+kick = generate_kick()
+snare = generate_snare()
+cymbal = generate_cymbal()
+blip = generate_blip()
 
-<span class="comment"># Generate 8-bit melody</span>
-chip.generate_melody(
-    notes=[<span class="number">440</span>, <span class="number">523</span>, <span class="number">587</span>, <span class="number">659</span>],
-    durations=[<span class="number">0.2</span>, <span class="number">0.2</span>, <span class="number">0.2</span>, <span class="number">0.4</span>],
-    output_file=<span class="string">"chiptune.wav"</span>
-)</code></pre>
+<span class="comment"># Combine into a pattern</span>
+pattern = np.concatenate([kick, snare, cymbal, blip])
+
+<span class="comment"># Normalize and save</span>
+pattern = np.clip(pattern, -<span class="number">1</span>, <span class="number">1</span>)
+wavfile.write(<span class="string">"chiptune.wav"</span>, <span class="number">44100</span>, (pattern * <span class="number">32767</span>).astype(np.int16))</code></pre>
                             </div>
                         </div>
                     </div>

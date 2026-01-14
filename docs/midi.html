@@ -136,41 +136,31 @@ generate_polyrhythmic_midi(
                         <div class="module-content">
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.midi.midi_looper <span class="keyword">import</span> MIDILooper
+<pre><code><span class="keyword">from</span> audio_dsp.midi.midi_looper <span class="keyword">import</span> midi_looper
 
-looper = MIDILooper()
-
-<span class="comment"># Load a MIDI file</span>
-looper.load(<span class="string">"melody.mid"</span>)
-
-<span class="comment"># Create 4 loops with ascending transposition</span>
-looper.loop(
-    repetitions=<span class="number">4</span>,
-    transpose_per_loop=<span class="number">2</span>  <span class="comment"># Up a whole step each loop</span>
+<span class="comment"># Create audio loop from MIDI file</span>
+midi_looper(
+    midi_file=<span class="string">"melody.mid"</span>,
+    output_file=<span class="string">"midi_loop.wav"</span>,
+    start=<span class="number">0</span>,         <span class="comment"># Starting note index</span>
+    length=<span class="number">16</span>,       <span class="comment"># Number of notes to include</span>
+    speed=<span class="number">1.0</span>,       <span class="comment"># Playback speed</span>
+    reverse=<span class="number">False</span>,   <span class="comment"># Reverse the loop</span>
+    loop_count=<span class="number">4</span>,    <span class="comment"># Number of repetitions</span>
+    transpose=<span class="number">0</span>,     <span class="comment"># Semitones to transpose</span>
+    randomise_notes=<span class="number">0.0</span>  <span class="comment"># Note shuffle amount (0-1)</span>
 )
 
-<span class="comment"># Apply velocity curve</span>
-looper.apply_velocity_curve(
-    curve=<span class="string">"crescendo"</span>,
-    min_vel=<span class="number">40</span>,
-    max_vel=<span class="number">120</span>
-)
-
-<span class="comment"># Time stretch (half speed)</span>
-looper.time_stretch(factor=<span class="number">2.0</span>)
-
-<span class="comment"># Save result</span>
-looper.save(<span class="string">"looped_melody.mid"</span>)
-
-<span class="comment"># Quick loop with transformations</span>
-looper.load(<span class="string">"bassline.mid"</span>)
-looper.loop(
-    repetitions=<span class="number">8</span>,
-    transpose_per_loop=<span class="number">0</span>,
-    velocity_variation=<span class="number">10</span>,  <span class="comment"># Random velocity +/- 10</span>
-    timing_humanize=<span class="number">5</span>  <span class="comment"># Random timing +/- 5 ticks</span>
-)
-looper.save(<span class="string">"humanized_bassline.mid"</span>)</code></pre>
+<span class="comment"># Create randomized variation</span>
+midi_looper(
+    midi_file=<span class="string">"bassline.mid"</span>,
+    output_file=<span class="string">"randomized_loop.wav"</span>,
+    start=<span class="number">50</span>,
+    length=<span class="number">10</span>,
+    speed=<span class="number">2.0</span>,       <span class="comment"># Double speed</span>
+    loop_count=<span class="number">8</span>,
+    randomise_notes=<span class="number">0.3</span>  <span class="comment"># 30% note shuffling per loop</span>
+)</code></pre>
                             </div>
                         </div>
                     </div>
@@ -183,97 +173,80 @@ looper.save(<span class="string">"humanized_bassline.mid"</span>)</code></pre>
                         <div class="module-header">
                             <div>
                                 <div class="module-title">
-                                    <h3>Microtonal MIDI</h3>
+                                    <h3>MIDI to Audio with Custom Tuning</h3>
                                     <span class="module-badge">midi.midi_retune</span>
                                     <span class="module-badge" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">requires mido</span>
                                 </div>
-                                <p class="module-desc">Retune MIDI files to alternative tuning systems using pitch bend messages.</p>
+                                <p class="module-desc">Convert MIDI files to audio with customizable octave ratio for stretched or compressed tunings.</p>
                             </div>
                         </div>
                         <div class="module-content">
                             <div class="params-section">
-                                <h4>Supported Tunings</h4>
+                                <h4>Parameters</h4>
                                 <table class="params-table">
                                     <thead>
                                         <tr>
-                                            <th>Tuning</th>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
                                             <th>Description</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><span class="param-name">just_intonation</span></td>
-                                            <td>Pure ratios based on harmonic series</td>
+                                            <td><span class="param-name">midi_file</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Path to input MIDI file</td>
                                         </tr>
                                         <tr>
-                                            <td><span class="param-name">pythagorean</span></td>
-                                            <td>Built on stacked perfect fifths (3:2)</td>
+                                            <td><span class="param-name">output_file</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">"output.wav"</span></td>
+                                            <td>Output WAV file path</td>
                                         </tr>
                                         <tr>
-                                            <td><span class="param-name">meantone</span></td>
-                                            <td>Quarter-comma meantone temperament</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="param-name">werckmeister</span></td>
-                                            <td>Werckmeister III well-temperament</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="param-name">19_edo</span></td>
-                                            <td>19 equal divisions of octave</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="param-name">31_edo</span></td>
-                                            <td>31 equal divisions of octave</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="param-name">custom</span></td>
-                                            <td>User-defined cents offsets per note</td>
+                                            <td><span class="param-name">tuning_offset</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.0</span></td>
+                                            <td>Octave ratio offset (0.0 = standard 2:1)</td>
                                         </tr>
                                     </tbody>
                                 </table>
+                                <p style="color: var(--text-secondary); margin-top: 1rem;">
+                                    The tuning offset modifies the octave ratio from the standard 2:1.
+                                    Positive values stretch intervals (wider octaves), negative values compress them.
+                                </p>
                             </div>
 
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.midi.midi_retune <span class="keyword">import</span> retune_midi
+<pre><code><span class="keyword">from</span> audio_dsp.midi.midi_retune.midi_retune <span class="keyword">import</span> midi_to_wav
 
-<span class="comment"># Retune to just intonation</span>
-retune_midi(
-    input_file=<span class="string">"piano.mid"</span>,
-    output_file=<span class="string">"piano_just.mid"</span>,
-    tuning=<span class="string">"just_intonation"</span>,
-    root=<span class="string">"C"</span>
+<span class="comment"># Convert MIDI to audio with standard tuning</span>
+midi_to_wav(
+    midi_file=<span class="string">"piano.mid"</span>,
+    output_file=<span class="string">"piano.wav"</span>,
+    tuning_offset=<span class="number">0.0</span>  <span class="comment"># Standard 2:1 octave</span>
 )
 
-<span class="comment"># Pythagorean tuning</span>
-retune_midi(
-    input_file=<span class="string">"strings.mid"</span>,
-    output_file=<span class="string">"strings_pythagorean.mid"</span>,
-    tuning=<span class="string">"pythagorean"</span>
+<span class="comment"># Apply stretched octave tuning</span>
+<span class="comment"># Positive offset = wider octave, negative = narrower</span>
+midi_to_wav(
+    midi_file=<span class="string">"strings.mid"</span>,
+    output_file=<span class="string">"strings_stretched.wav"</span>,
+    tuning_offset=<span class="number">0.02</span>  <span class="comment"># Slightly wide octaves</span>
 )
 
-<span class="comment"># Custom tuning (cents offset from 12-TET)</span>
-custom_tuning = {
-    <span class="string">'C'</span>: <span class="number">0</span>,
-    <span class="string">'C#'</span>: <span class="number">-10</span>,
-    <span class="string">'D'</span>: <span class="number">4</span>,
-    <span class="string">'D#'</span>: <span class="number">-6</span>,
-    <span class="string">'E'</span>: <span class="number">-14</span>,
-    <span class="string">'F'</span>: <span class="number">-2</span>,
-    <span class="string">'F#'</span>: <span class="number">-12</span>,
-    <span class="string">'G'</span>: <span class="number">2</span>,
-    <span class="string">'G#'</span>: <span class="number">-8</span>,
-    <span class="string">'A'</span>: <span class="number">0</span>,
-    <span class="string">'A#'</span>: <span class="number">-4</span>,
-    <span class="string">'B'</span>: <span class="number">-12</span>
-}
+<span class="comment"># Create compressed tuning effect</span>
+midi_to_wav(
+    midi_file=<span class="string">"melody.mid"</span>,
+    output_file=<span class="string">"melody_compressed.wav"</span>,
+    tuning_offset=-<span class="number">0.5</span>  <span class="comment"># Dramatically compressed intervals</span>
+)
 
-retune_midi(
-    input_file=<span class="string">"melody.mid"</span>,
-    output_file=<span class="string">"melody_custom.mid"</span>,
-    tuning=<span class="string">"custom"</span>,
-    custom_cents=custom_tuning
-)</code></pre>
+<span class="comment"># Command line usage:</span>
+<span class="comment"># python midi_retune.py input.mid -o output.wav -t -0.05</span></code></pre>
                             </div>
                         </div>
                     </div>

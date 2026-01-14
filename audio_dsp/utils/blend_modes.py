@@ -60,4 +60,5 @@ def blend_wav_files(top_wav, bottom_wav, blend_mode, output_wav):
     print(f"Blended audio saved as {output_wav}")
 
 # Example Usage
-blend_wav_files("t_layer.wav", "b_layer.wav", "color_burn", "blended_output.wav")
+if __name__ == "__main__":
+    blend_wav_files("t_layer.wav", "b_layer.wav", "color_burn", "blended_output.wav")

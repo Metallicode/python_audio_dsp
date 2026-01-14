@@ -291,26 +291,20 @@ sf.write(<span class="string">"raga_melody.wav"</span>, np.concatenate(melody_au
 
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.sequencer.GOL.game_of_life <span class="keyword">import</span> GameOfLifeSequencer
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.GOL.game_of_life <span class="keyword">import</span> game_of_life_sequencer
 
-<span class="comment"># Create sequencer with 8 pitches, 16 time steps</span>
-gol = GameOfLifeSequencer(rows=<span class="number">8</span>, cols=<span class="number">16</span>)
-
-<span class="comment"># Initialize with random pattern</span>
-gol.randomize(density=<span class="number">0.3</span>)
-
-<span class="comment"># Generate sequence for 4 generations</span>
-sequence = gol.generate(generations=<span class="number">4</span>, base_freq=<span class="number">220</span>)
-
-<span class="comment"># Export to audio</span>
-gol.export(<span class="string">"gol_sequence.wav"</span>, bpm=<span class="number">120</span>)
-
-<span class="comment"># EDO variant for microtonal</span>
-<span class="keyword">from</span> audio_dsp.sequencer.GOL.game_of_life_edo <span class="keyword">import</span> GameOfLifeEDO
-
-gol_micro = GameOfLifeEDO(rows=<span class="number">19</span>, cols=<span class="number">16</span>, divisions=<span class="number">19</span>)
-gol_micro.randomize()
-gol_micro.generate(generations=<span class="number">3</span>)</code></pre>
+<span class="comment"># Run the Game of Life sequencer</span>
+<span class="comment"># Requires a samples/ directory with audio files</span>
+game_of_life_sequencer(
+    sample_dir=<span class="string">"samples/"</span>,
+    output_video=<span class="string">"gol_sequencer.mp4"</span>,
+    output_audio=<span class="string">"gol_sequencer.wav"</span>,
+    rows=<span class="number">10</span>,
+    cols=<span class="number">10</span>,
+    tempo=<span class="number">120</span>,
+    max_steps=<span class="number">100</span>,
+    init_alive=<span class="number">0.2</span>  <span class="comment"># Initial density of live cells</span>
+)</code></pre>
                             </div>
                         </div>
                     </div>
@@ -354,30 +348,22 @@ gol_micro.generate(generations=<span class="number">3</span>)</code></pre>
 
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.sequencer.text_sequencer.text_sequencer <span class="keyword">import</span> TextSequencer
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.text_sequencer.text_sequencer <span class="keyword">import</span> sequencer
 
-<span class="comment"># Create text-to-music converter</span>
-seq = TextSequencer()
-
-<span class="comment"># Convert text to note sequence</span>
-notes = seq.text_to_notes(<span class="string">"Hello World!"</span>)
-<span class="keyword">print</span>(notes)  <span class="comment"># List of frequencies/MIDI notes</span>
-
-<span class="comment"># Generate audio from text</span>
-seq.generate_audio(
-    text=<span class="string">"The quick brown fox"</span>,
-    output_file=<span class="string">"text_music.wav"</span>,
-    duration_per_char=<span class="number">0.2</span>
+<span class="comment"># Run the text-based step sequencer</span>
+<span class="comment"># Requires numbered sample files (1_kick.wav, 2_snare.wav, etc.)</span>
+<span class="comment"># and a pattern.txt file with binary patterns</span>
+sequencer(
+    pattern_file=<span class="string">"pattern.txt"</span>,
+    samples_dir=<span class="string">"samples"</span>,
+    output_file=<span class="string">"sequence.wav"</span>,
+    bpm=<span class="number">120</span>
 )
 
-<span class="comment"># Sample clustering</span>
-<span class="keyword">from</span> audio_dsp.sequencer.text_sequencer.sample_clustering <span class="keyword">import</span> cluster_samples
-
-<span class="comment"># Cluster drum samples by spectral similarity</span>
-clusters = cluster_samples(
-    sample_dir=<span class="string">"drums/"</span>,
-    n_clusters=<span class="number">4</span>
-)</code></pre>
+<span class="comment"># Pattern file format (pattern.txt):</span>
+<span class="comment"># 10101010  (track 1 pattern)</span>
+<span class="comment"># 00001000  (track 2 pattern)</span>
+<span class="comment"># [1.0, 0.8]  (volume per track)</span></code></pre>
                             </div>
                         </div>
                     </div>
@@ -409,27 +395,31 @@ clusters = cluster_samples(
 
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.sequencer.non_linear.non_linear_seq <span class="keyword">import</span> NonLinearSequencer
-
-<span class="comment"># Create chaotic sequencer</span>
-seq = NonLinearSequencer()
-
-<span class="comment"># Generate using Lorenz attractor</span>
-sequence = seq.lorenz_sequence(
-    steps=<span class="number">64</span>,
-    sigma=<span class="number">10.0</span>,
-    rho=<span class="number">28.0</span>,
-    beta=<span class="number">8.0</span>/<span class="number">3.0</span>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.non_linear.non_linear_seq <span class="keyword">import</span> (
+    load_samples,
+    parse_pattern,
+    generate_liquid_timing,
+    generate_pattern
 )
 
-<span class="comment"># Map to musical scale</span>
-notes = seq.map_to_scale(sequence, scale=<span class="string">"minor"</span>, root=<span class="number">60</span>)
+<span class="comment"># Load drum samples (kick.wav, snare.wav, hihat.wav)</span>
+samples = load_samples(<span class="string">"samples/"</span>)
 
-<span class="comment"># Logistic map for rhythm</span>
-rhythm = seq.logistic_map(
-    steps=<span class="number">32</span>,
-    r=<span class="number">3.9</span>,  <span class="comment"># Chaos parameter (3.57-4.0 for chaos)</span>
-    x0=<span class="number">0.5</span>  <span class="comment"># Initial value</span>
+<span class="comment"># Parse pattern string (K=kick, S=snare, H=hihat, .=rest)</span>
+<span class="comment"># Use - to extend notes, | for loop count</span>
+pattern = <span class="string">"K.S-HK.S-H--.S.H--|4"</span>
+events, loops = parse_pattern(pattern)
+
+<span class="comment"># Generate non-linear "liquid" timing</span>
+liquid_times, samples_per_loop = generate_liquid_timing(
+    events,
+    bpm=<span class="number">160</span>,
+    loop_length=<span class="number">4</span>
+)
+
+<span class="comment"># Generate audio output</span>
+output = generate_pattern(
+    samples, events, liquid_times, loops, samples_per_loop
 )</code></pre>
                             </div>
                         </div>
@@ -452,23 +442,26 @@ rhythm = seq.logistic_map(
                         <div class="module-content">
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.sequencer.melody_choice <span class="keyword">import</span> MelodyGenerator
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.melody_choice <span class="keyword">import</span> develop_melody, generate_counterpoint
 
-gen = MelodyGenerator()
+<span class="comment"># Base melody as (frequency, duration) tuples</span>
+base_melody = [
+    (<span class="number">261.63</span>, <span class="number">1.0</span>),  <span class="comment"># C4</span>
+    (<span class="number">293.66</span>, <span class="number">0.5</span>),  <span class="comment"># D4</span>
+    (<span class="number">329.63</span>, <span class="number">0.5</span>),  <span class="comment"># E4</span>
+    (<span class="number">392.00</span>, <span class="number">1.0</span>),  <span class="comment"># G4</span>
+]
 
-<span class="comment"># Generate melody with constraints</span>
-melody = gen.generate(
-    length=<span class="number">16</span>,
-    scale=<span class="string">"pentatonic"</span>,
-    root=<span class="number">60</span>,  <span class="comment"># Middle C</span>
-    range_octaves=<span class="number">2</span>,
-    step_preference=<span class="number">0.7</span>,  <span class="comment"># Prefer stepwise motion</span>
-    contour=<span class="string">"arch"</span>  <span class="comment"># Overall shape</span>
-)
+<span class="comment"># Develop melody to 16 bars using mirror, flip, repeat</span>
+developed = develop_melody(base_melody, target_bars=<span class="number">16</span>)
 
-<span class="comment"># Apply rhythmic pattern</span>
-rhythm = [<span class="number">1</span>, <span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">2</span>]
-sequence = gen.apply_rhythm(melody, rhythm)</code></pre>
+<span class="comment"># Generate counterpoint voices</span>
+voice2 = generate_counterpoint(developed, voice_num=<span class="number">1</span>)
+voice3 = generate_counterpoint(developed, voice_num=-<span class="number">1</span>)
+
+<span class="comment"># Each voice is a list of (frequency, duration) tuples</span>
+<span class="keyword">print</span>(f<span class="string">"Main voice: {len(developed)} notes"</span>)
+<span class="keyword">print</span>(f<span class="string">"Counterpoint 2: {len(voice2)} notes"</span>)</code></pre>
                             </div>
                         </div>
                     </div>

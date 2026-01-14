@@ -3,8 +3,6 @@ from scipy.io import wavfile
 import random
 import os
 
-print("3-Voice Composition Generator Started!")
-
 # Audio parameters
 SAMPLE_RATE = 44100  # Hz
 BAR_DURATION = 4.0  # 4 beats per bar (adjustable via BPM)
