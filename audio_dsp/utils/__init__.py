@@ -3,12 +3,14 @@ Utility functions for audio processing.
 
 Core utilities (no optional dependencies):
     from audio_dsp.utils import generate_maqam_frequencies, white_noise
+    from audio_dsp.utils import load_audio, save_audio, normalize_audio, resample_audio
 
 Utilities requiring optional dependencies:
     from audio_dsp.utils import SpectralAnalyzer  # requires librosa
     from audio_dsp.utils import image_to_rhythmic_audio  # requires PIL, cv2
 """
 
+from .audio_io import load_audio, save_audio, normalize_audio, resample_audio
 from .maqamat import generate_maqam_frequencies
 from .scales_and_melody import (
     categorise_interval,
@@ -37,6 +39,10 @@ from .noise_algorithms import (
     cellular_automata_noise,
 )
 __all__ = [
+    "load_audio",
+    "save_audio",
+    "normalize_audio",
+    "resample_audio",
     "generate_maqam_frequencies",
     "categorise_interval",
     "generate_scale",

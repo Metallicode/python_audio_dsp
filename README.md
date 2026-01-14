@@ -54,6 +54,7 @@ pip install audio-dsp[audio]   # Extended audio processing (librosa, pydub)
 - Logarithmic tunings
 
 ### Utilities (`audio_dsp.utils`)
+- **Audio I/O** - Lightweight audio loading/saving (scipy-based, no librosa required)
 - Scale and melody utilities
 - Spectral analysis
 - Transient extraction
@@ -81,15 +82,18 @@ sf.write("output.wav", audio, 44100)
 ```
 
 ```python
+from audio_dsp.utils import load_audio, save_audio
 from audio_dsp.effects import vocoder
-import librosa
 
-# Load audio
-carrier, sr = librosa.load("carrier.wav", sr=44100)
-modulator, _ = librosa.load("modulator.wav", sr=44100)
+# Load audio (accepts file paths or numpy arrays)
+carrier, sr = load_audio("carrier.wav")
+modulator, sr = load_audio("modulator.wav")
 
 # Apply vocoder effect
 output, sr = vocoder(carrier, modulator, sr, n_filters=16)
+
+# Save output
+save_audio("output.wav", output, sr)
 ```
 
 ## License

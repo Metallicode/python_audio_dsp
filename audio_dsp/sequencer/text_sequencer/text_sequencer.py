@@ -1,16 +1,17 @@
 import numpy as np
-import librosa
 import soundfile as sf
 import os
 import ast
 import re
+from audio_dsp.utils import load_audio, normalize_audio
 
 def load_samples(samples_dir="samples"):
     samples = {}
     for filename in os.listdir(samples_dir):
         if filename.startswith(tuple(f"{i}_" for i in range(1, 10))) and filename.endswith(".wav"):
             track_num = int(filename.split("_")[0])
-            samples[track_num] = librosa.load(os.path.join(samples_dir, filename), sr=None)[0]
+            audio, sr = load_audio(os.path.join(samples_dir, filename))
+            samples[track_num] = audio
     return samples
 
 def parse_pattern(pattern_file="pattern.txt"):
@@ -122,7 +123,7 @@ def sequencer(pattern_file="pattern.txt", samples_dir="samples", output_file="se
                     print(f"Trigger at {start/sr:.5f}")
     
     # Normalize and save
-    output = librosa.util.normalize(output)
+    output = normalize_audio(output)
     sf.write(output_file, output, sr, subtype='PCM_16')
     print(f"Sequence saved to {output_file} (duration: {total_samples/sr:.5f}s)")
 

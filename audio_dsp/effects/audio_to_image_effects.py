@@ -5,9 +5,10 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter, rotate
 import cv2
+from audio_dsp.utils import load_audio, normalize_audio
 
 def audio_to_image(file, size=256):
-    audio, sr = librosa.load(file, mono=True)
+    audio, sr = load_audio(file, mono=True)
     n_fft = 2048
     hop_length = 512
     spec = librosa.stft(audio, n_fft=n_fft, hop_length=hop_length)
@@ -306,7 +307,7 @@ def image_to_audio(img, original_audio, sr, n_fft, hop_length):
     spec = mag * np.exp(1j * phase)
     audio_out = librosa.istft(spec, hop_length=hop_length, length=len(original_audio))
     # Normalize audio
-    audio_out = librosa.util.normalize(audio_out)
+    audio_out = normalize_audio(audio_out)
     return np.clip(audio_out, -1.0, 1.0)
 
 # Example workflow with new effects

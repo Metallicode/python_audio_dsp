@@ -2,6 +2,7 @@ import numpy as np
 import librosa
 import soundfile as sf
 from scipy.signal import resample
+from audio_dsp.utils import load_audio, normalize_audio
 
 def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_length=2.0):
     """
@@ -13,7 +14,7 @@ def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_l
     - loop_length: Duration of output loop in seconds
     """
     # Load WAV
-    audio, sr = librosa.load(input_file, sr=None, mono=True)
+    audio, sr = load_audio(input_file, mono=True)
     loop_samples = int(loop_length * sr)
     
     # Ensure audio fits loop length
@@ -114,7 +115,7 @@ def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_l
     
     # Reassemble audio
     output_audio = np.concatenate(segments)
-    output_audio = librosa.util.normalize(output_audio)
+    output_audio = normalize_audio(output_audio)
     
     # Save output
     sf.write(output_file, output_audio, sr, subtype='PCM_16')

@@ -2,6 +2,7 @@ import numpy as np
 from scipy.io import wavfile
 import librosa
 import re
+from audio_dsp.utils import load_audio, resample_audio
 
 SAMPLE_RATE = 44100
 
@@ -54,9 +55,9 @@ def get_chord_steps(quality, voices):
         raise ValueError(f"Unknown chord quality: {quality}")
 
 def generate_chord_progression(chord_str, bpm, sample_file="sample.wav", voices=3):
-    sample, sr = librosa.load(sample_file, sr=SAMPLE_RATE, mono=True)
+    sample, sr = load_audio(sample_file, mono=True)
     if sr != SAMPLE_RATE:
-        sample = librosa.resample(sample, orig_sr=sr, target_sr=SAMPLE_RATE)
+        sample = resample_audio(sample, sr, SAMPLE_RATE)
     
     chords = parse_chord_string(chord_str)
     print(f"Parsed chords: {chords}")

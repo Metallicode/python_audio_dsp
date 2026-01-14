@@ -345,9 +345,9 @@ sf.write(<span class="string">"filtered.wav"</span>, filtered, sr)</code></pre>
                                 <div class="module-title">
                                     <h3>vocoder</h3>
                                     <span class="module-badge">effects.vocoder</span>
-                                    <span class="module-badge" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">requires librosa</span>
+                                    <span class="module-badge" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">no librosa needed</span>
                                 </div>
-                                <p class="module-desc">Classic vocoder with spectral envelope modulation and configurable filter banks.</p>
+                                <p class="module-desc">Classic vocoder with spectral envelope modulation and configurable filter banks. Accepts file paths or numpy arrays.</p>
                             </div>
                         </div>
                         <div class="module-content">
@@ -364,22 +364,28 @@ sf.write(<span class="string">"filtered.wav"</span>, filtered, sr)</code></pre>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><span class="param-name">modulator_file</span></td>
-                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-name">carrier</span></td>
+                                            <td><span class="param-type">str | np.array | None</span></td>
                                             <td><span class="param-default">required</span></td>
-                                            <td>Path to voice/control WAV file</td>
+                                            <td>Carrier signal (file path, array, or None to generate)</td>
                                         </tr>
                                         <tr>
-                                            <td><span class="param-name">carrier_file</span></td>
-                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-name">modulator</span></td>
+                                            <td><span class="param-type">str | np.array</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Modulator signal (file path or array)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">sr</span></td>
+                                            <td><span class="param-type">int</span></td>
                                             <td><span class="param-default">None</span></td>
-                                            <td>Path to carrier WAV (optional)</td>
+                                            <td>Sample rate (required if inputs are arrays)</td>
                                         </tr>
                                         <tr>
                                             <td><span class="param-name">output_file</span></td>
                                             <td><span class="param-type">str</span></td>
-                                            <td><span class="param-default">"vocoded.wav"</span></td>
-                                            <td>Output file path</td>
+                                            <td><span class="param-default">None</span></td>
+                                            <td>Output file path (optional)</td>
                                         </tr>
                                         <tr>
                                             <td><span class="param-name">n_filters</span></td>
@@ -412,18 +418,20 @@ sf.write(<span class="string">"filtered.wav"</span>, filtered, sr)</code></pre>
                             <div class="code-section">
                                 <h4>Example Usage</h4>
 <pre><code><span class="keyword">from</span> audio_dsp.effects.vocoder <span class="keyword">import</span> vocoder
+<span class="keyword">from</span> audio_dsp.utils <span class="keyword">import</span> load_audio, save_audio
+
+<span class="comment"># Load audio files</span>
+carrier, sr = load_audio(<span class="string">"synth_pad.wav"</span>)
+modulator, sr = load_audio(<span class="string">"voice.wav"</span>)
 
 <span class="comment"># Voice through synth carrier</span>
-vocoder(
-    modulator_file=<span class="string">"voice.wav"</span>,
-    carrier_file=<span class="string">"synth_pad.wav"</span>,
-    output_file=<span class="string">"robot_voice.wav"</span>,
-    n_filters=<span class="number">64</span>
-)
+output, sr = vocoder(carrier, modulator, sr=sr, n_filters=<span class="number">64</span>)
+save_audio(<span class="string">"robot_voice.wav"</span>, output, sr)
 
 <span class="comment"># Classic Daft Punk style (sawtooth carrier)</span>
-vocoder(
-    modulator_file=<span class="string">"speech.wav"</span>,
+output, sr = vocoder(
+    carrier=<span class="keyword">None</span>,
+    modulator=<span class="string">"speech.wav"</span>,
     carrier_type=<span class="string">"sawtooth"</span>,
     carrier_freq=<span class="number">110</span>,
     n_filters=<span class="number">48</span>,
@@ -431,8 +439,9 @@ vocoder(
 )
 
 <span class="comment"># Whisper effect (noise carrier)</span>
-vocoder(
-    modulator_file=<span class="string">"speech.wav"</span>,
+output, sr = vocoder(
+    carrier=<span class="keyword">None</span>,
+    modulator=<span class="string">"speech.wav"</span>,
     carrier_type=<span class="string">"noise"</span>,
     n_filters=<span class="number">32</span>
 )</code></pre>

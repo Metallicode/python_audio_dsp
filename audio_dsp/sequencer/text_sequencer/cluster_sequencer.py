@@ -1,23 +1,23 @@
 import numpy as np
-import librosa
 import soundfile as sf
 import os
 import ast
 import re
 import json
 import random
+from audio_dsp.utils import load_audio, normalize_audio
 
 def load_cluster_samples(cluster_file="cluster_mapping.json", samples_dir="samples"):
     """Load samples from clusters, returning audio data and paths."""
     with open(cluster_file, "r") as f:
         cluster_map = json.load(f)
-    
+
     samples = {}
     for cluster_id, sample_paths in cluster_map.items():
         samples[cluster_id] = []
         for path in sample_paths:
             full_path = os.path.join(samples_dir, os.path.basename(path))
-            audio_data = librosa.load(full_path, sr=None)[0]
+            audio_data, sr = load_audio(full_path)
             samples[cluster_id].append((audio_data, full_path))
     print(f"Loaded clusters: { {k: len(v) for k, v in samples.items()} }")
     return samples
@@ -144,7 +144,7 @@ def sequencer(pattern_file="pattern.txt", cluster_file="cluster_mapping.json", s
                     print(f"Trigger at {start/sr:.5f}s with {os.path.basename(sample_path)}")
 
     # Normalize and save
-    output = librosa.util.normalize(output)
+    output = normalize_audio(output)
     sf.write(output_file, output, sr, subtype='PCM_16')
     print(f"Sequence saved to {output_file} (duration: {total_samples/sr:.5f}s)")
 

@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import librosa
-import librosa.display
 from scipy.io import wavfile
+from audio_dsp.utils import load_audio, resample_audio
 
 def reverb_effect(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_delay=0.0, decay_factor=1.0, 
                   hpf_freq=100.0, lpf_freq=10000.0):
@@ -28,10 +27,10 @@ def reverb_effect(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_del
         signal = signal / np.max(np.abs(signal))
     total_samples = len(signal)
     
-    # Load impulse response with librosa (supports WAV and AIFF)
-    ir, ir_rate = librosa.load(ir_path, sr=None, mono=True)  # Load at native rate, mono
+    # Load impulse response
+    ir, ir_rate = load_audio(ir_path, mono=True)
     if ir_rate != sample_rate:
-        ir = librosa.resample(ir, orig_sr=ir_rate, target_sr=sample_rate)
+        ir = resample_audio(ir, ir_rate, sample_rate)
     ir = ir / np.max(np.abs(ir))  # Normalize IR
     ir_samples = len(ir)
     print(f"IR loaded: {ir_path}, Samples: {ir_samples}, Rate: {sample_rate}")
@@ -104,10 +103,11 @@ def reverb_effect(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_del
 
 # Test it
 if __name__ == "__main__":
-    # Load sample data with librosa (supports WAV and AIFF)
-    data, samplerate = librosa.load("input.wav", sr=44100, mono=True)
+    # Load sample data
+    data, samplerate = load_audio("input.wav", mono=True)
     if samplerate != 44100:
-        data = librosa.resample(data, orig_sr=samplerate, target_sr=44100)
+        data = resample_audio(data, samplerate, 44100)
+        samplerate = 44100
     data = data / np.max(np.abs(data))  # Normalize
     
     ir_dir = "impulse_response/"
