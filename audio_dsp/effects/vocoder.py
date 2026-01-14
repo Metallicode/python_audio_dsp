@@ -15,28 +15,39 @@ def generate_carrier(sr, length, type="noise", freq=100):
     else:
         raise ValueError("Carrier type must be 'noise' or 'sawtooth'")
 
-def vocoder(modulator_file, carrier_file=None, output_file="vocoded.wav", 
-            n_filters=32, freq_range=(20, 20000), carrier_type="noise", carrier_freq=100):
+def vocoder(carrier, modulator, sr=None, n_filters=32, freq_range=(20, 20000),
+            carrier_type="noise", carrier_freq=100, output_file=None):
     """
     Vocoder with band-pass filters, using shortest input length.
-    - modulator_file: Path to modulator WAV
-    - carrier_file: Path to carrier WAV (optional)
-    - output_file: Path to output WAV
+
+    Parameters:
+    - carrier: Carrier signal as numpy array or path to WAV file.
+               If None, generates carrier using carrier_type.
+    - modulator: Modulator signal as numpy array or path to WAV file.
+    - sr: Sample rate (required if inputs are arrays, ignored if loading from files)
     - n_filters: Number of band-pass filters
     - freq_range: Frequency range for filters (Hz)
-    - carrier_type: 'noise' or 'sawtooth' if no carrier_file
+    - carrier_type: 'noise' or 'sawtooth' if carrier is None
     - carrier_freq: Frequency for sawtooth carrier (Hz)
+    - output_file: Path to output WAV (optional, if None returns array)
+
+    Returns:
+    - Vocoded audio as numpy array (if output_file is None)
     """
-    # Load modulator
-    modulator, sr = librosa.load(modulator_file, sr=None, mono=True)
-    
-    # Load or generate carrier
-    if carrier_file:
-        carrier, sr_carrier = librosa.load(carrier_file, sr=None, mono=True)
+    # Load or use modulator
+    if isinstance(modulator, str):
+        modulator, sr = librosa.load(modulator, sr=None, mono=True)
+    elif sr is None:
+        raise ValueError("sr (sample rate) is required when modulator is an array")
+
+    # Load, generate, or use carrier
+    if carrier is None:
+        carrier = generate_carrier(sr, len(modulator), type=carrier_type, freq=carrier_freq)
+    elif isinstance(carrier, str):
+        carrier, sr_carrier = librosa.load(carrier, sr=None, mono=True)
         if sr_carrier != sr:
             carrier = librosa.resample(carrier, orig_sr=sr_carrier, target_sr=sr)
-    else:
-        carrier = generate_carrier(sr, len(modulator), type=carrier_type, freq=carrier_freq)
+    # else: carrier is already an array
     
     # Use shortest length
     min_length = min(len(modulator), len(carrier))
@@ -77,36 +88,48 @@ def vocoder(modulator_file, carrier_file=None, output_file="vocoded.wav",
         car_band = sosfilt(sos, carrier)
         output += car_band * env
     
-    # Normalize and save
+    # Normalize output
     output = librosa.util.normalize(output)
-    sf.write(output_file, output, sr, subtype='PCM_16')
-    print(f"Vocoded audio saved to {output_file}")
+
+    # Save to file or return array
+    if output_file:
+        sf.write(output_file, output, sr, subtype='PCM_16')
+        print(f"Vocoded audio saved to {output_file}")
+    return output, sr
 
 # Example usage
 if __name__ == "__main__":
-    vocoder(
-        modulator_file="voice.wav",
-        carrier_file="synth.wav",
+    # With carrier and modulator WAV files
+    output, sr = vocoder(
+        carrier="synth.wav",
+        modulator="voice.wav",
         output_file="vocoded_with_carrier.wav",
         n_filters=32,
         freq_range=(20, 20000)
     )
-    
-    vocoder(
-        modulator_file="voice.wav",
-        carrier_file=None,
+
+    # With generated noise carrier
+    output, sr = vocoder(
+        carrier=None,
+        modulator="voice.wav",
         output_file="vocoded_noise.wav",
         n_filters=32,
         freq_range=(20, 20000),
         carrier_type="noise"
     )
-    
-    vocoder(
-        modulator_file="voice.wav",
-        carrier_file=None,
+
+    # With generated sawtooth carrier
+    output, sr = vocoder(
+        carrier=None,
+        modulator="voice.wav",
         output_file="vocoded_sawtooth.wav",
         n_filters=64,
         freq_range=(20, 20000),
         carrier_type="sawtooth",
         carrier_freq=50
     )
+
+    # Example with numpy arrays (no file output)
+    # carrier_array, sr = librosa.load("synth.wav", sr=None, mono=True)
+    # modulator_array, sr = librosa.load("voice.wav", sr=None, mono=True)
+    # output, sr = vocoder(carrier_array, modulator_array, sr, n_filters=16)
