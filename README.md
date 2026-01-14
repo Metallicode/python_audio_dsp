@@ -89,7 +89,7 @@ carrier, sr = librosa.load("carrier.wav", sr=44100)
 modulator, _ = librosa.load("modulator.wav", sr=44100)
 
 # Apply vocoder effect
-output = vocoder(carrier, modulator, sr, num_bands=16)
+output = vocoder(carrier, modulator, sr, n_filters=16)
 ```
 
 ## License
