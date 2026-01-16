@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 
 def filter_effect(input_signal, sample_rate=44100, cutoff=1500, resonance=0.7, q=1.0, filter_type="lowpass"):
     """

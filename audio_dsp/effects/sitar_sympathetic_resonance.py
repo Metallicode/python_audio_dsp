@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 
 def sitar_sympathetic_resonance(input_signal, sample_rate=44100, resonant_freqs=None, 
                                 decay=1.0, wet_mix=0.5, threshold=12.0, visualize=False):

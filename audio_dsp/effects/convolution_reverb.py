@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 from audio_dsp.utils import load_audio, resample_audio
 
 def reverb_effect(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_delay=0.0, decay_factor=1.0, 

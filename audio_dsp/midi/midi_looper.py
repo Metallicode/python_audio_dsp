@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 import mido
 import random
 
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     midi_looper(midi_file, output_file, start, length, speed, reverse, loop_count, transpose, randomise_notes)
 
 # import numpy as np
-# from scipy.io import wavfile
+# from audio_dsp.utils import wav_io as wavfile
 # import mido
 # import random
 

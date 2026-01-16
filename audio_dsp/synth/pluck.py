@@ -1,5 +1,5 @@
 # import numpy as np
-# from scipy.io import wavfile
+# from audio_dsp.utils import wav_io as wavfile
 
 # SAMPLE_RATE = 44100
 
@@ -50,7 +50,7 @@
 #     generate_string_pluck(output_file, length, frequency, intensity)
 
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 
 SAMPLE_RATE = 44100
 

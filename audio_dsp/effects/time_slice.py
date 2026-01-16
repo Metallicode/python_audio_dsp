@@ -1,5 +1,5 @@
 # import numpy as np
-# from scipy.io import wavfile
+# from audio_dsp.utils import wav_io as wavfile
 
 # SAMPLE_RATE = 44100
 
@@ -74,7 +74,7 @@
 #     main(input_file, output_file, window_size)
 
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 
 SAMPLE_RATE = 44100
 

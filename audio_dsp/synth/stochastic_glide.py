@@ -1,7 +1,7 @@
 # import numpy as np
 # import matplotlib.pyplot as plt
 # import librosa.display
-# from scipy.io import wavfile
+# from audio_dsp.utils import wav_io as wavfile
 
 # def quantized_lfo_arpeggio(sample_rate=44100, freq_set=None, 
 #                            lfo_rate=5.0, glide_rate=0.1, output_length=10.0, 
@@ -119,7 +119,7 @@
 
 
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 
 def quantized_lfo_arpeggio(sample_rate=44100, freq_set=None, 
                            lfo_rate=5.0, glide_rate=0.1, output_length=10.0, 

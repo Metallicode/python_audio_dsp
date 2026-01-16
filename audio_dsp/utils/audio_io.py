@@ -5,7 +5,7 @@ Uses scipy.io.wavfile as the lightweight backend for WAV file operations.
 """
 
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 from scipy.signal import resample_poly
 from math import gcd
 

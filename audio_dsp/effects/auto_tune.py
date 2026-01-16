@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import librosa
 import librosa.display
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 
 def autotune_effect(input_signal, sample_rate=44100, scale="chromatic", depth=1.0, visualize=False, correction_window=20):
     """

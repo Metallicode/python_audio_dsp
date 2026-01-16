@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 import librosa
 
 def phaser_flanger_effect(input_signal, sample_rate=44100, phaser_rate=0.5, phaser_depth=0.8, 

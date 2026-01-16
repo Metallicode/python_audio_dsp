@@ -2,7 +2,7 @@ import numpy as np
 import pyaudio
 import time
 from sympy import Matrix
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 
 # Initialize PyAudio
 p = pyaudio.PyAudio()

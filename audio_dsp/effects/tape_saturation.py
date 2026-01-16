@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 import librosa
 
 def tape_saturation(input_signal, sample_rate=44100, drive=2.0, warmth=0.1, output_level=1.0):

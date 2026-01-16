@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 
 # Audio settings
 SAMPLE_RATE = 44100  # Hz

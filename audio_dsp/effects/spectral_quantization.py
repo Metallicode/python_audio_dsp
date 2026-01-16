@@ -1,7 +1,7 @@
 # import numpy as np
 # import wave
 # import struct
-# from scipy.io import wavfile
+# from audio_dsp.utils import wav_io as wavfile
 # from scipy.signal import stft, istft
 # import librosa  # For sophisticated envelope following
 
@@ -103,7 +103,7 @@
 import numpy as np
 import wave
 import struct
-from scipy.io import wavfile
+from audio_dsp.utils import wav_io as wavfile
 from scipy.signal import stft, istft
 import librosa
 
