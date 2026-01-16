@@ -70,7 +70,7 @@ python3 midi_retune_new.py test.mid -o tuned.wav -t -0.5
 
 ### Output
 - **Normalization**: Scales the audio to a maximum amplitude of 1.
-- **WAV**: Saved at 44100 Hz using `scipy.io.wavfile`.
+- **WAV**: Saved at 44100 Hz using the built-in `wav_io` module.
 
 ## Theory
 - **Octave Ratio**: Normally 2:1 (doubling frequency per 12 semitones). A negative `tuning_offset` (e.g., `-0.5`) compresses the pitch range, while a positive offset (e.g., `+0.1`) expands it.

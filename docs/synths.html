@@ -1064,7 +1064,7 @@ generate_56k_dialup(
     generate_blip
 )
 <span class="keyword">import</span> numpy <span class="keyword">as</span> np
-<span class="keyword">from</span> scipy.io <span class="keyword">import</span> wavfile
+<span class="keyword">from</span> audio_dsp.utils <span class="keyword">import</span> save_audio
 
 <span class="comment"># Generate individual 8-bit sounds</span>
 kick = generate_kick()
@@ -1077,7 +1077,7 @@ pattern = np.concatenate([kick, snare, cymbal, blip])
 
 <span class="comment"># Normalize and save</span>
 pattern = np.clip(pattern, -<span class="number">1</span>, <span class="number">1</span>)
-wavfile.write(<span class="string">"chiptune.wav"</span>, <span class="number">44100</span>, (pattern * <span class="number">32767</span>).astype(np.int16))</code></pre>
+save_audio(<span class="string">"chiptune.wav"</span>, pattern, <span class="number">44100</span>)</code></pre>
                             </div>
                         </div>
                     </div>

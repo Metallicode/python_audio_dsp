@@ -56,7 +56,7 @@ pip install audio-dsp[audio]   # Extended audio processing (librosa, pydub)
 - Logarithmic tunings
 
 ### Utilities (`audio_dsp.utils`)
-- **Audio I/O** - Lightweight audio loading/saving (scipy-based, no librosa required)
+- **Audio I/O** - Lightweight audio loading/saving with built-in WAV support (no external dependencies)
 - Scale and melody utilities
 - Spectral analysis
 - Transient extraction
