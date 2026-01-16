@@ -1,3 +1,5 @@
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/audio-dsp?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/audio-dsp)
+
 # audio-dsp
 
 A Python audio DSP library for synthesis, effects, and sequencing.
