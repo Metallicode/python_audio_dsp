@@ -1,7 +1,7 @@
 import numpy as np
 from audio_dsp.utils import wav_io as wavfile
 from scipy import interpolate
-import librosa
+from audio_dsp.utils import resample_audio
 
 def pitch_drift(input_signal, sample_rate=44100, drift_depth=0.1, drift_rate=0.05):
     """
@@ -52,14 +52,14 @@ if __name__ == "__main__":
     # Load sample data
     samplerate, data = wavfile.read("input.wav")
     if samplerate != 44100:
-        data = librosa.resample(data.astype(np.float64), orig_sr=samplerate, target_sr=44100)
+        data = resample_audio(data.astype(np.float64), samplerate, 44100)
     if data.ndim > 1:
         data = np.mean(data, axis=1)
     data = data / np.max(np.abs(data))  # Normalize
-    
+
     # Apply pitch drift
     drifted = pitch_drift(data, sample_rate=44100, drift_depth=0.6, drift_rate=0.05)
-    
+
     # Save output
     wavfile.write("pitch_drift.wav", 44100, drifted.astype(np.float32))
     print(f"Pitch-drifted audio saved to pitch_drift.wav")

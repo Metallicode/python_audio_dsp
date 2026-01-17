@@ -1,6 +1,6 @@
 import numpy as np
 from audio_dsp.utils import wav_io as wavfile
-import librosa
+from audio_dsp.utils import resample_audio
 
 def tape_saturation(input_signal, sample_rate=44100, drive=2.0, warmth=0.1, output_level=1.0):
     """
@@ -42,14 +42,14 @@ if __name__ == "__main__":
     # Load sample data
     samplerate, data = wavfile.read("input.wav")
     if samplerate != 44100:
-        data = librosa.resample(data.astype(np.float64), orig_sr=samplerate, target_sr=44100)
+        data = resample_audio(data.astype(np.float64), samplerate, 44100)
     if data.ndim > 1:
         data = np.mean(data, axis=1)
     data = data / np.max(np.abs(data))  # Normalize
-    
+
     # Apply tape saturation
     saturated = tape_saturation(data, sample_rate=44100, drive=3.0, warmth=0.4, output_level=1.0)
-    
+
     # Save output
     wavfile.write("tape_saturation.wav", 44100, saturated.astype(np.float32))
     print(f"Tape-saturated audio saved to tape_saturation.wav")
