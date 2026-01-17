@@ -421,8 +421,8 @@ sf.write(<span class="string">"filtered.wav"</span>, filtered, sr)</code></pre>
 <span class="keyword">from</span> audio_dsp.utils <span class="keyword">import</span> load_audio, save_audio
 
 <span class="comment"># Load audio files</span>
-carrier, sr = load_audio(<span class="string">"synth_pad.wav"</span>)
-modulator, sr = load_audio(<span class="string">"voice.wav"</span>)
+sr, carrier = load_audio(<span class="string">"synth_pad.wav"</span>)
+sr, modulator = load_audio(<span class="string">"voice.wav"</span>)
 
 <span class="comment"># Voice through synth carrier</span>
 output, sr = vocoder(carrier, modulator, sr=sr, n_filters=<span class="number">64</span>)

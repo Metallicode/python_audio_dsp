@@ -46,13 +46,13 @@ def vocoder(carrier, modulator, sr=None, n_filters=32, freq_range=(20, 20000),
     - Vocoded audio as numpy array (if output_file is None)
     """
     # Load or use modulator
-    modulator, sr = load_audio(modulator, sr=sr, mono=True)
+    sr, modulator = load_audio(modulator, sr=sr, mono=True)
 
     # Load, generate, or use carrier
     if carrier is None:
         carrier = generate_carrier(sr, len(modulator), type=carrier_type, freq=carrier_freq)
     elif isinstance(carrier, str):
-        carrier, sr_carrier = load_audio(carrier, mono=True)
+        sr_carrier, carrier = load_audio(carrier, mono=True)
         if sr_carrier != sr:
             carrier = resample_audio(carrier, sr_carrier, sr)
     # else: carrier is already an array
@@ -141,6 +141,6 @@ if __name__ == "__main__":
 
     # Example with numpy arrays (no file output)
     # from audio_dsp.utils import load_audio
-    # carrier_array, sr = load_audio("synth.wav")
-    # modulator_array, sr = load_audio("voice.wav")
+    # sr, carrier_array = load_audio("synth.wav")
+    # sr, modulator_array = load_audio("voice.wav")
     # output, sr = vocoder(carrier_array, modulator_array, sr, n_filters=16)

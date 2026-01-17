@@ -10,7 +10,7 @@ def load_samples(samples_dir="samples"):
     for filename in os.listdir(samples_dir):
         if filename.startswith(tuple(f"{i}_" for i in range(1, 10))) and filename.endswith(".wav"):
             track_num = int(filename.split("_")[0])
-            audio, sr = load_audio(os.path.join(samples_dir, filename))
+            sr, audio = load_audio(os.path.join(samples_dir, filename))
             samples[track_num] = audio
     return samples
 

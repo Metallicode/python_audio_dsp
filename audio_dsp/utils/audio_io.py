@@ -20,8 +20,10 @@ def load_audio(audio_input, sr=None, mono=True):
     - mono: Convert to mono if True (default True)
 
     Returns:
-    - audio: Audio data as float32 numpy array normalized to [-1, 1]
     - sr: Sample rate
+    - audio: Audio data as float32 numpy array normalized to [-1, 1]
+
+    Note: Return order matches wavfile.read() convention: (sample_rate, data)
 
     Raises:
     - ValueError: If audio_input is an array and sr is not provided
@@ -53,7 +55,7 @@ def load_audio(audio_input, sr=None, mono=True):
         if mono and audio.ndim > 1:
             audio = np.mean(audio, axis=1)
 
-        return audio, file_sr
+        return file_sr, audio
 
     elif isinstance(audio_input, np.ndarray):
         if sr is None:
@@ -65,7 +67,7 @@ def load_audio(audio_input, sr=None, mono=True):
         if mono and audio.ndim > 1:
             audio = np.mean(audio, axis=1)
 
-        return audio, sr
+        return sr, audio
 
     else:
         raise TypeError(f"audio_input must be a file path (str) or numpy array, got {type(audio_input)}")

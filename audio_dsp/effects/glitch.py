@@ -1,7 +1,6 @@
 import numpy as np
-import librosa
 import soundfile as sf
-from scipy.signal import resample
+from scipy.signal import resample, stft, istft
 from audio_dsp.utils import load_audio, normalize_audio
 
 def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_length=2.0):
@@ -14,7 +13,7 @@ def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_l
     - loop_length: Duration of output loop in seconds
     """
     # Load WAV
-    audio, sr = load_audio(input_file, mono=True)
+    sr, audio = load_audio(input_file, mono=True)
     loop_samples = int(loop_length * sr)
     
     # Ensure audio fits loop length
@@ -39,7 +38,13 @@ def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_l
         return np.tile(chunk, divisions)[:len(segment)]
     
     def pitch_shift(segment, n_steps=4):
-        return librosa.effects.pitch_shift(segment, sr=sr, n_steps=n_steps)
+        # Simple pitch shift using resampling (also changes duration slightly)
+        # n_steps: semitones to shift (positive = higher pitch)
+        factor = 2 ** (n_steps / 12)
+        # Resample to change pitch
+        shifted = resample(segment, int(len(segment) / factor))
+        # Resample back to original length
+        return resample(shifted, len(segment))
     
     def reverse(segment):
         return segment[::-1]
@@ -61,7 +66,40 @@ def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_l
         return np.clip(output, -1.0, 1.0)
     
     def time_stretch(segment, rate=2.0):
-        stretched = librosa.effects.time_stretch(segment, rate=rate)
+        # Simple time stretch using phase vocoder approach
+        # rate > 1 = faster/shorter, rate < 1 = slower/longer
+        n_fft = 512
+        hop_length = n_fft // 4
+
+        # STFT
+        f, t, spec = stft(segment, fs=sr, nperseg=n_fft, noverlap=n_fft - hop_length)
+
+        # Calculate new time axis
+        new_length = int(spec.shape[1] / rate)
+        if new_length < 2:
+            new_length = 2
+
+        # Interpolate magnitude and phase
+        time_old = np.arange(spec.shape[1])
+        time_new = np.linspace(0, spec.shape[1] - 1, new_length)
+
+        mag = np.abs(spec)
+        phase = np.angle(spec)
+
+        # Interpolate each frequency bin
+        new_mag = np.zeros((mag.shape[0], new_length), dtype=mag.dtype)
+        new_phase = np.zeros((phase.shape[0], new_length), dtype=phase.dtype)
+
+        for i in range(mag.shape[0]):
+            new_mag[i] = np.interp(time_new, time_old, mag[i])
+            new_phase[i] = np.interp(time_new, time_old, np.unwrap(phase[i]))
+
+        new_spec = new_mag * np.exp(1j * new_phase)
+
+        # ISTFT
+        _, stretched = istft(new_spec, fs=sr, nperseg=n_fft, noverlap=n_fft - hop_length)
+
+        # Adjust to original segment length
         if len(stretched) > len(segment):
             return stretched[:len(segment)]
         return np.pad(stretched, (0, len(segment) - len(stretched)), 'constant')
@@ -86,11 +124,21 @@ def glitch_machine(input_file, output_file, n_segments=32, intensity=0.5, loop_l
         return np.where(mask, -segment, segment)
     
     def spectral_freeze(segment):
-        spec = librosa.stft(segment, n_fft=512, hop_length=256)
+        n_fft = 512
+        hop_length = 256
+        # STFT using scipy
+        f, t, spec = stft(segment, fs=sr, nperseg=n_fft, noverlap=n_fft - hop_length)
         # Freeze a random frame
-        freeze_frame = np.random.randint(spec.shape[1])
-        frozen_spec = np.tile(spec[:, [freeze_frame]], (1, spec.shape[1]))
-        return librosa.istft(frozen_spec, hop_length=256, length=len(segment))
+        if spec.shape[1] > 0:
+            freeze_frame = np.random.randint(spec.shape[1])
+            frozen_spec = np.tile(spec[:, [freeze_frame]], (1, spec.shape[1]))
+            # ISTFT
+            _, output = istft(frozen_spec, fs=sr, nperseg=n_fft, noverlap=n_fft - hop_length)
+            # Adjust length
+            if len(output) > len(segment):
+                return output[:len(segment)]
+            return np.pad(output, (0, len(segment) - len(output)), 'constant')
+        return segment
     
     # Available effects
     effects = [

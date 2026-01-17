@@ -102,8 +102,8 @@ from audio_dsp.utils import load_audio, save_audio
 from audio_dsp.effects import vocoder
 
 # Load audio (accepts file paths or numpy arrays)
-carrier, sr = load_audio("carrier.wav")
-modulator, sr = load_audio("modulator.wav")
+sr, carrier = load_audio("carrier.wav")
+sr, modulator = load_audio("modulator.wav")
 
 # Apply vocoder effect
 output, sr = vocoder(carrier, modulator, sr, n_filters=16)

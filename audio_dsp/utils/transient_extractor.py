@@ -34,7 +34,7 @@ class TransientExtractor:
         - max_transient_len: Max transient duration in seconds
         """
         # Load WAV file
-        audio, sr = load_audio(wav_file, mono=True)
+        sr, audio = load_audio(wav_file, mono=True)
         print(f"Loaded {wav_file}: {len(audio)} samples, max amplitude: {np.max(np.abs(audio)):.5f}")
 
         if len(audio) < self.window_size:

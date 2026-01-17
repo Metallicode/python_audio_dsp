@@ -28,7 +28,7 @@ def reverb_effect(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_del
     total_samples = len(signal)
     
     # Load impulse response
-    ir, ir_rate = load_audio(ir_path, mono=True)
+    ir_rate, ir = load_audio(ir_path, mono=True)
     if ir_rate != sample_rate:
         ir = resample_audio(ir, ir_rate, sample_rate)
     ir = ir / np.max(np.abs(ir))  # Normalize IR
@@ -104,7 +104,7 @@ def reverb_effect(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_del
 # Test it
 if __name__ == "__main__":
     # Load sample data
-    data, samplerate = load_audio("input.wav", mono=True)
+    samplerate, data = load_audio("input.wav", mono=True)
     if samplerate != 44100:
         data = resample_audio(data, samplerate, 44100)
         samplerate = 44100

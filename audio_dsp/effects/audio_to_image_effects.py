@@ -8,7 +8,7 @@ import cv2
 from audio_dsp.utils import load_audio, normalize_audio
 
 def audio_to_image(file, size=256):
-    audio, sr = load_audio(file, mono=True)
+    sr, audio = load_audio(file, mono=True)
     n_fft = 2048
     hop_length = 512
     spec = librosa.stft(audio, n_fft=n_fft, hop_length=hop_length)

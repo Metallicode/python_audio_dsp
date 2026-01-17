@@ -17,7 +17,7 @@ def load_cluster_samples(cluster_file="cluster_mapping.json", samples_dir="sampl
         samples[cluster_id] = []
         for path in sample_paths:
             full_path = os.path.join(samples_dir, os.path.basename(path))
-            audio_data, sr = load_audio(full_path)
+            sr, audio_data = load_audio(full_path)
             samples[cluster_id].append((audio_data, full_path))
     print(f"Loaded clusters: { {k: len(v) for k, v in samples.items()} }")
     return samples

@@ -213,8 +213,8 @@
 <span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> vocoder
 
 <span class="comment"># Load from file</span>
-carrier, sr = load_audio(<span class="string">"carrier.wav"</span>)
-modulator, sr = load_audio(<span class="string">"modulator.wav"</span>)
+sr, carrier = load_audio(<span class="string">"carrier.wav"</span>)
+sr, modulator = load_audio(<span class="string">"modulator.wav"</span>)
 
 <span class="comment"># Process with vocoder (accepts files OR arrays)</span>
 output, sr = vocoder(carrier, modulator, sr=sr, n_filters=<span class="number">16</span>)

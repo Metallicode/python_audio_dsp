@@ -55,7 +55,7 @@ def get_chord_steps(quality, voices):
         raise ValueError(f"Unknown chord quality: {quality}")
 
 def generate_chord_progression(chord_str, bpm, sample_file="sample.wav", voices=3):
-    sample, sr = load_audio(sample_file, mono=True)
+    sr, sample = load_audio(sample_file, mono=True)
     if sr != SAMPLE_RATE:
         sample = resample_audio(sample, sr, SAMPLE_RATE)
     

@@ -15,7 +15,7 @@ class SpectralAnalyzer:
         - num_peaks: Number of spectral peaks to extract
         """
         # Load WAV file
-        audio, sr = load_audio(wav_file, mono=True)
+        sr, audio = load_audio(wav_file, mono=True)
         if len(audio) < self.fft_size:
             audio = np.pad(audio, (0, self.fft_size - len(audio)), 'constant')
 
