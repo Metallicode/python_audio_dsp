@@ -4,7 +4,7 @@
 
 A Python audio DSP library for synthesis, effects, and sequencing.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/metallicode/python_audio_dsp/blob/main/examples/Quickstart.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Metallicode/python_audio_dsp/blob/master/examples/Quickstart.ipynb)
 
 ## Installation
 
@@ -72,11 +72,11 @@ pip install audio-dsp[audio]   # Extended audio processing (librosa, pydub)
 
 | Notebook | Description | Link |
 | :--- | :--- | :--- |
-| **00. Quickstart** | Generate your first sound in 30 seconds. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/metallicode/python_audio_dsp/blob/main/examples/Quickstart.ipynb) |
-| **01. Synthesizers** | Deep dive into Oscillators, FM, and Envelopes. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/metallicode/python_audio_dsp/blob/main/examples/Synthesis.ipynb) |
-| **02. Effects Rack** | How to chain Reverb, Delay, and Distortion. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/metallicode/python_audio_dsp/blob/main/examples/Effects.ipynb) |
-| **03. Sequencing** | creating generative melodies and MIDI tools. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/metallicode/python_audio_dsp/blob/main/examples/Sequencing.ipynb) |
-| **04. Utilities** | Audio file handling and analysis tools. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/metallicode/python_audio_dsp/blob/main/examples/Utilities.ipynb) |
+| **00. Quickstart** | Generate your first sound in 30 seconds. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Metallicode/python_audio_dsp/blob/master/examples/Quickstart.ipynb) |
+| **01. Synthesizers** | Deep dive into Oscillators, FM, and Envelopes. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Metallicode/python_audio_dsp/blob/master/examples/Synthesis.ipynb) |
+| **02. Effects Rack** | How to chain Reverb, Delay, and Distortion. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Metallicode/python_audio_dsp/blob/master/examples/Effects.ipynb) |
+| **03. Sequencing** | creating generative melodies and MIDI tools. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Metallicode/python_audio_dsp/blob/master/examples/Sequencing.ipynb) |
+| **04. Utilities** | Audio file handling and analysis tools. | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Metallicode/python_audio_dsp/blob/master/examples/Utilities.ipynb) |
 
 
 
