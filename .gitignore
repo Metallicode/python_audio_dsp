@@ -30,6 +30,11 @@ venv/
 
 # Include impulse response files
 !audio_dsp/effects/impulse_response/*
+
+# Include example files
+!examples/assets/*
+!examples/assets/one-shots/*
+
 # Build artifacts
 dist/
 build/
