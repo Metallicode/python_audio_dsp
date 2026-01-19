@@ -2,12 +2,12 @@ import numpy as np
 from audio_dsp.utils import wav_io as wavfile
 import librosa
 
-def phaser_flanger_effect(input_signal, sample_rate=44100, phaser_rate=0.5, phaser_depth=0.8, 
-                          phaser_stages=4, flanger_delay_base=0.005, flanger_delay_depth=0.005, 
-                          flanger_rate=0.25, phaser_mix=0.7, flanger_mix=0.7, wet_mix=0.7, wet_gain=1.5):
+def phaser_flanger(input_signal, sample_rate=44100, phaser_rate=0.5, phaser_depth=0.8,
+                   phaser_stages=4, flanger_delay_base=0.005, flanger_delay_depth=0.005,
+                   flanger_rate=0.25, phaser_mix=0.7, flanger_mix=0.7, wet_mix=0.7, wet_gain=1.5):
     """
     Apply a strong combined phaser and flanger effect to an input signal.
-    
+
     Args:
         input_signal: Input audio array (mono, normalized to ±1)
         sample_rate: Sample rate in Hz (default 44100)
@@ -21,7 +21,7 @@ def phaser_flanger_effect(input_signal, sample_rate=44100, phaser_rate=0.5, phas
         flanger_mix: Balance between flanger and dry (0–1, default 0.7 = mostly flanger)
         wet_mix: Overall wet/dry mix (0–1, default 0.7 = wetter)
         wet_gain: Wet signal gain factor (e.g., 1.5 = boosted wet signal)
-    
+
     Returns:
         Output audio array with phaser/flanger effect applied
     """
@@ -84,10 +84,14 @@ if __name__ == "__main__":
     data = data / np.max(np.abs(data))  # Normalize
     
     # Apply phaser/flanger effect
-    effected = phaser_flanger_effect(data, sample_rate=44100, phaser_rate=0.5, phaser_depth=0.8, 
-                                     phaser_stages=4, flanger_delay_base=0.005, flanger_delay_depth=0.005, 
-                                     flanger_rate=0.25, phaser_mix=0.7, flanger_mix=0.7, wet_mix=0.7)
-    
+    effected = phaser_flanger(data, sample_rate=44100, phaser_rate=0.5, phaser_depth=0.8,
+                              phaser_stages=4, flanger_delay_base=0.005, flanger_delay_depth=0.005,
+                              flanger_rate=0.25, phaser_mix=0.7, flanger_mix=0.7, wet_mix=0.7)
+
     # Save output
     wavfile.write("phaser_flanger_effect.wav", 44100, effected.astype(np.float32))
     print(f"Phaser/flanger effect audio saved to phaser_flanger_effect.wav")
+
+
+# Backward compatibility alias
+phaser_flanger_effect = phaser_flanger

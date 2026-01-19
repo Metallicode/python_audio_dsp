@@ -1,10 +1,10 @@
 import numpy as np
 from audio_dsp.utils import wav_io as wavfile
 
-def filter_effect(input_signal, sample_rate=44100, cutoff=1500, resonance=0.7, q=1.0, filter_type="lowpass"):
+def filter(input_signal, sample_rate=44100, cutoff=1500, resonance=0.7, q=1.0, filter_type="lowpass"):
     """
     Apply a 4-pole resonant filter effect to an input signal.
-    
+
     Args:
         input_signal: Input audio array (mono, normalized to ±1)
         sample_rate: Sample rate in Hz (default 44100)
@@ -12,7 +12,7 @@ def filter_effect(input_signal, sample_rate=44100, cutoff=1500, resonance=0.7, q
         resonance: Resonance amplitude (0–5)
         q: Q factor (0.1–10) - bandwidth control
         filter_type: 'lowpass' or 'bandpass' (default 'lowpass')
-    
+
     Returns:
         Output audio array with filter effect applied
     """
@@ -79,13 +79,17 @@ if __name__ == "__main__":
     data = data / np.max(np.abs(data))  # Normalize
     
     # Apply low-pass filter
-    lp_filtered = filter_effect(data, sample_rate=44100, cutoff=1000, resonance=0.7, q=1.0, 
-                                filter_type="lowpass")
+    lp_filtered = filter(data, sample_rate=44100, cutoff=1000, resonance=0.7, q=1.0,
+                         filter_type="lowpass")
     wavfile.write("lp_filtered.wav", 44100, lp_filtered.astype(np.float32))
     print(f"Low-pass filtered audio saved to lp_filtered.wav")
-    
+
     # Apply bandpass filter
-    bp_filtered = filter_effect(data, sample_rate=44100, cutoff=1000, resonance=1.0, q=2.0, 
-                                filter_type="bandpass")
+    bp_filtered = filter(data, sample_rate=44100, cutoff=1000, resonance=1.0, q=2.0,
+                         filter_type="bandpass")
     wavfile.write("bp_filtered.wav", 44100, bp_filtered.astype(np.float32))
     print(f"Bandpass filtered audio saved to bp_filtered.wav")
+
+
+# Backward compatibility alias
+filter_effect = filter

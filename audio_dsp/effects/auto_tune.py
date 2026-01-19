@@ -4,10 +4,10 @@ import librosa
 import librosa.display
 from audio_dsp.utils import wav_io as wavfile
 
-def autotune_effect(input_signal, sample_rate=44100, scale="chromatic", depth=1.0, visualize=False, correction_window=20):
+def autotune(input_signal, sample_rate=44100, scale="chromatic", depth=1.0, visualize=False, correction_window=20):
     """
     Apply an auto-tune effect using librosa.pyin with frame-based pitch correction.
-    
+
     Args:
         input_signal: Input audio array (mono, normalized to ±1)
         sample_rate: Sample rate in Hz (default 44100)
@@ -15,7 +15,7 @@ def autotune_effect(input_signal, sample_rate=44100, scale="chromatic", depth=1.
         depth: Correction strength (0–1, 0=no correction, 1=full snap, default 1.0 = hard tune)
         visualize: If True, generates a pitch correction graph.
         correction_window: Number of frames per correction block (smooths correction).
-    
+
     Returns:
         Output audio array with auto-tune effect applied
     """
@@ -100,7 +100,11 @@ if __name__ == "__main__":
         data = np.mean(data, axis=1)
     data = data / np.max(np.abs(data))  
 
-    autotuned = autotune_effect(data, sample_rate=44100, scale="major", depth=6.0, visualize=True, correction_window=50)
-    
+    autotuned = autotune(data, sample_rate=44100, scale="major", depth=6.0, visualize=True, correction_window=50)
+
     wavfile.write("autotune_effect.wav", 44100, autotuned.astype(np.float32))
     print(f"Auto-tune effect audio saved to autotune_effect.wav")
+
+
+# Backward compatibility alias
+autotune_effect = autotune

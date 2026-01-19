@@ -3,17 +3,17 @@ from audio_dsp.utils import wav_io as wavfile
 from scipy import interpolate
 from audio_dsp.utils import resample_audio
 
-def flutter_effect(input_signal, sample_rate=44100, base_rate=5.0, rate_diff=1.0, depth=0.05):
+def flutter(input_signal, sample_rate=44100, base_rate=5.0, rate_diff=1.0, depth=0.05):
     """
     Apply a flutter effect with dual-sine LFO modulation to an input signal.
-    
+
     Args:
         input_signal: Input audio array (mono, normalized to ±1)
         sample_rate: Sample rate in Hz (default 44100)
         base_rate: Base LFO frequency in Hz (e.g., 5.0 = 5 Hz)
         rate_diff: Frequency difference between LFOs in Hz (e.g., 1.0 = 1 Hz diff)
         depth: Modulation depth (e.g., 0.05 = ±5% speed variation, ~1-10 Hz range)
-    
+
     Returns:
         Output audio array with flutter effect applied
     """
@@ -59,8 +59,12 @@ if __name__ == "__main__":
     data = data / np.max(np.abs(data))  # Normalize
 
     # Apply flutter effect
-    fluttered = flutter_effect(data, sample_rate=44100, base_rate=5.0, rate_diff=1.0, depth=0.05)
+    fluttered = flutter(data, sample_rate=44100, base_rate=5.0, rate_diff=1.0, depth=0.05)
 
     # Save output
     wavfile.write("flutter_effect.wav", 44100, fluttered.astype(np.float32))
     print(f"Flutter-effect audio saved to flutter_effect.wav")
+
+
+# Backward compatibility alias
+flutter_effect = flutter

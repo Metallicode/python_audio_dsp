@@ -4,11 +4,11 @@ import librosa
 from pydub import AudioSegment
 import os
 
-def lofi_effect(input_signal, sample_rate=44100, drive=5.0, quantize_q=0.3, 
-                reduced_sample_rate=8000, kbps_rate=64, mp3_iterations=1):
+def lofi(input_signal, sample_rate=44100, drive=5.0, quantize_q=0.3,
+         reduced_sample_rate=8000, kbps_rate=64, mp3_iterations=1):
     """
     Apply a lo-fi effect chain to an input signal.
-    
+
     Args:
         input_signal: Input audio array (mono, normalized to ±1)
         sample_rate: Input/output sample rate in Hz (default 44100)
@@ -17,7 +17,7 @@ def lofi_effect(input_signal, sample_rate=44100, drive=5.0, quantize_q=0.3,
         reduced_sample_rate: Temporary sample rate in Hz (e.g., 8000 = lo-fi crunch)
         kbps_rate: Simulated bitrate in kbps (e.g., 64 = muffled loss)
         mp3_iterations: Number of MP3 encode/decode cycles (e.g., 1–100)
-    
+
     Returns:
         Output audio array with lo-fi effects applied
     """
@@ -96,9 +96,13 @@ if __name__ == "__main__":
     data = data / np.max(np.abs(data))  # Normalize
     
     # Apply lo-fi effect
-    lofi = lofi_effect(data, sample_rate=44100, drive=1.0, quantize_q=0.3, 
-                       reduced_sample_rate=30000, kbps_rate=156, mp3_iterations=5)
-    
+    lofi_audio = lofi(data, sample_rate=44100, drive=1.0, quantize_q=0.3,
+                      reduced_sample_rate=30000, kbps_rate=156, mp3_iterations=5)
+
     # Save output
-    wavfile.write("lofi_effect.wav", 44100, lofi.astype(np.float32))
+    wavfile.write("lofi_effect.wav", 44100, lofi_audio.astype(np.float32))
     print(f"Lo-fi effect audio saved to lofi_effect.wav")
+
+
+# Backward compatibility alias
+lofi_effect = lofi

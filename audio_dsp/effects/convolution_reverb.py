@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 from audio_dsp.utils import wav_io as wavfile
 from audio_dsp.utils import load_audio, resample_audio
 
-def reverb_effect(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_delay=0.0, decay_factor=1.0, 
-                  hpf_freq=100.0, lpf_freq=10000.0):
+def reverb(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_delay=0.0, decay_factor=1.0,
+           hpf_freq=100.0, lpf_freq=10000.0):
     """
     Apply a high-fidelity convolution reverb effect using an impulse response (WAV or AIFF).
-    
+
     Args:
         input_signal: Input audio array (mono, normalized to ±1)
         ir_path: Path to impulse response file (WAV or AIFF)
@@ -17,7 +17,7 @@ def reverb_effect(input_signal, ir_path, sample_rate=44100, wet_mix=0.5, pre_del
         decay_factor: Decay time scaling (e.g., 0.5 = shorter, 2.0 = longer, default 1.0)
         hpf_freq: High-pass filter cutoff in Hz (default 100 Hz)
         lpf_freq: Low-pass filter cutoff in Hz (default 10000 Hz)
-    
+
     Returns:
         Output audio array with reverb effect applied
     """
@@ -113,9 +113,13 @@ if __name__ == "__main__":
     ir_dir = "impulse_response/"
     # Apply reverb effect with an impulse response (replace with your AIF IR path)
     ir_path = ir_dir+"3000CStreetGarageStairwell.wav"  # Replace with your AIF IR file path
-    reverbed = reverb_effect(data, ir_path, sample_rate=44100, wet_mix=0.5, pre_delay=0.05, decay_factor=1.0, 
-                             hpf_freq=100.0, lpf_freq=10000.0)
-    
+    reverbed = reverb(data, ir_path, sample_rate=44100, wet_mix=0.5, pre_delay=0.05, decay_factor=1.0,
+                      hpf_freq=100.0, lpf_freq=10000.0)
+
     # Save output as WAV
     wavfile.write("reverb_effect.wav", 44100, reverbed.astype(np.float32))
     print(f"Reverb effect audio saved to reverb_effect.wav")
+
+
+# Backward compatibility alias
+reverb_effect = reverb

@@ -4,10 +4,10 @@ import librosa
 import matplotlib.pyplot as plt
 import librosa.display
 
-def variable_quantizer_effect(input_signal, sample_rate=44100, frame_size=2048, hop_size=512, min_quant_bits=4, max_quant_bits=16, visualize=False):
+def variable_quantizer(input_signal, sample_rate=44100, frame_size=2048, hop_size=512, min_quant_bits=4, max_quant_bits=16, visualize=False):
     """
     Apply a Variable Quantizer Effect—quantization depth varies with RMS amplitude.
-    
+
     Args:
         input_signal: Input audio array (mono, normalized to ±1)
         sample_rate: Sample rate in Hz (default 44100)
@@ -16,7 +16,7 @@ def variable_quantizer_effect(input_signal, sample_rate=44100, frame_size=2048, 
         min_quant_bits: Minimum quantization bits (default 4 = 16 levels)
         max_quant_bits: Maximum quantization bits (default 16 = 65536 levels)
         visualize: If True, plot waveform and spectrogram (default False)
-    
+
     Returns:
         Output audio array with variable quantization applied
     """
@@ -101,9 +101,13 @@ if __name__ == "__main__":
     data = data / np.max(np.abs(data))  # Normalize
     
     # Apply Variable Quantizer Effect with visualization
-    effected = variable_quantizer_effect(data, sample_rate=44100, frame_size=1024, hop_size=512, 
-                                         min_quant_bits=10, max_quant_bits=16, visualize=True)
-    
+    effected = variable_quantizer(data, sample_rate=44100, frame_size=1024, hop_size=512,
+                                  min_quant_bits=10, max_quant_bits=16, visualize=True)
+
     # Save output
     wavfile.write("variable_quantizer.wav", 44100, effected.astype(np.float32))
     print(f"Variable Quantizer Effect audio saved to variable_quantizer.wav")
+
+
+# Backward compatibility alias
+variable_quantizer_effect = variable_quantizer

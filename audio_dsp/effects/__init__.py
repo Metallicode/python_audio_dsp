@@ -2,14 +2,17 @@
 Audio effects and processing modules.
 
 Core effects (no optional dependencies):
-    from audio_dsp.effects import filter_effect, fuzz_distortion
+    from audio_dsp.effects import filter, fuzz_distortion
 
 Effects requiring librosa (install with: pip install audio-dsp[full]):
-    from audio_dsp.effects import vocoder, autotune_effect, reverb_effect
+    from audio_dsp.effects import vocoder, autotune, reverb
+
+Unified API pattern - all effects follow:
+    effect_name(signal, sample_rate, **params) -> numpy.ndarray
 """
 
 # Core effects that only require numpy/scipy
-from .LP_BP_filter import filter_effect
+from .LP_BP_filter import filter, filter_effect  # filter_effect is backward compat alias
 from .distortion import (
     fuzz_distortion,
     overdrive_distortion,
@@ -34,8 +37,10 @@ from .distortion import (
 from .negative_audio import create_negative_waveform, sidechain_compressor
 
 __all__ = [
-    # Core filters and distortion
-    "filter_effect",
+    # Core filters (new unified API)
+    "filter",
+    "filter_effect",  # backward compat
+    # Distortion effects
     "fuzz_distortion",
     "overdrive_distortion",
     "saturation_distortion",
@@ -63,20 +68,20 @@ __all__ = [
 # Optional effects requiring librosa
 try:
     from .tape_saturation import tape_saturation
-    from .phaser import phaser_flanger_effect
+    from .phaser import phaser_flanger, phaser_flanger_effect  # phaser_flanger_effect is backward compat
     from .pitch_drift import pitch_drift
-    from .pitch_flutter import flutter_effect
-    from .super_delay import SuperDelay
-    from .super_clean_compressor import SuperCleanCompressor
+    from .pitch_flutter import flutter, flutter_effect  # flutter_effect is backward compat
+    from .super_delay import delay, SuperDelay  # SuperDelay is backward compat
+    from .super_clean_compressor import compress, SuperCleanCompressor  # SuperCleanCompressor is backward compat
     from .vocoder import vocoder
-    from .auto_tune import autotune_effect
-    from .convolution_reverb import reverb_effect
-    from .lofi import lofi_effect
-    from .glitch import glitch_machine
-    from .random_chorus import random_chorus
+    from .auto_tune import autotune, autotune_effect  # autotune_effect is backward compat
+    from .convolution_reverb import reverb, reverb_effect  # reverb_effect is backward compat
+    from .lofi import lofi, lofi_effect  # lofi_effect is backward compat
+    from .glitch import glitch, glitch_machine  # glitch_machine is backward compat
+    from .random_chorus import chorus, random_chorus  # random_chorus is backward compat
     from .temporal_gravity_warp import temporal_gravity_warp
     from .sitar_sympathetic_resonance import sitar_sympathetic_resonance
-    from .variable_quantizer import variable_quantizer_effect
+    from .variable_quantizer import variable_quantizer, variable_quantizer_effect  # variable_quantizer_effect is backward compat
     from .melt_spectrum import melt_spectrum
     from .time_slice import time_slice_to_sines
     from .frequency_splicer import create_morphed_signal, splice_spectrum
@@ -87,21 +92,22 @@ try:
     from .multi_band_saturation import process_multi_band
 
     __all__.extend([
+        # New unified API names
         "tape_saturation",
-        "phaser_flanger_effect",
+        "phaser_flanger",
         "pitch_drift",
-        "flutter_effect",
-        "SuperDelay",
-        "SuperCleanCompressor",
+        "flutter",
+        "delay",
+        "compress",
         "vocoder",
-        "autotune_effect",
-        "reverb_effect",
-        "lofi_effect",
-        "glitch_machine",
-        "random_chorus",
+        "autotune",
+        "reverb",
+        "lofi",
+        "glitch",
+        "chorus",
         "temporal_gravity_warp",
         "sitar_sympathetic_resonance",
-        "variable_quantizer_effect",
+        "variable_quantizer",
         "melt_spectrum",
         "time_slice_to_sines",
         "create_morphed_signal",
@@ -111,6 +117,17 @@ try:
         "topological_compressor",
         "fractional_compressor",
         "process_multi_band",
+        # Backward compatibility aliases
+        "phaser_flanger_effect",
+        "flutter_effect",
+        "SuperDelay",
+        "SuperCleanCompressor",
+        "autotune_effect",
+        "reverb_effect",
+        "lofi_effect",
+        "glitch_machine",
+        "random_chorus",
+        "variable_quantizer_effect",
     ])
 except (ImportError, Exception):
     pass  # librosa not installed or broken
