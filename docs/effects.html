@@ -44,11 +44,12 @@
                     <a href="#filter" class="quick-link">Filter</a>
                     <a href="#vocoder" class="quick-link">Vocoder</a>
                     <a href="#phaser" class="quick-link">Phaser/Flanger</a>
-                    <a href="#delay" class="quick-link">Super Delay</a>
+                    <a href="#chorus" class="quick-link">Chorus</a>
+                    <a href="#delay" class="quick-link">Delay</a>
                     <a href="#glitch" class="quick-link">Glitch</a>
+                    <a href="#compressors" class="quick-link">Compressors</a>
                     <a href="#multiband" class="quick-link">Multi-Band Saturation</a>
                     <a href="#negative" class="quick-link">Negative Audio</a>
-                    <a href="#compressors" class="quick-link">Compressors</a>
                 </div>
 
                 <!-- Distortion -->
@@ -245,7 +246,7 @@ sf.write(<span class="string">"distorted.wav"</span>, fuzzed, sr)</code></pre>
                         <div class="module-header">
                             <div>
                                 <div class="module-title">
-                                    <h3>filter_effect</h3>
+                                    <h3>filter</h3>
                                     <span class="module-badge">effects.LP_BP_filter</span>
                                 </div>
                                 <p class="module-desc">4-pole resonant ladder filter with tanh saturation for analog-style filtering.</p>
@@ -306,13 +307,13 @@ sf.write(<span class="string">"distorted.wav"</span>, fuzzed, sr)</code></pre>
 
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> filter_effect
+<pre><code><span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> filter
 <span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
 
 audio, sr = sf.read(<span class="string">"input.wav"</span>)
 
 <span class="comment"># Low-pass with resonance</span>
-filtered = filter_effect(
+filtered = filter(
     audio,
     sample_rate=sr,
     cutoff=<span class="number">800</span>,
@@ -321,7 +322,7 @@ filtered = filter_effect(
 )
 
 <span class="comment"># Bandpass for wah-style</span>
-bandpass = filter_effect(
+bandpass = filter(
     audio,
     sample_rate=sr,
     cutoff=<span class="number">1200</span>,
@@ -457,9 +458,8 @@ output, sr = vocoder(
                         <div class="module-header">
                             <div>
                                 <div class="module-title">
-                                    <h3>phaser_flanger_effect</h3>
+                                    <h3>phaser_flanger</h3>
                                     <span class="module-badge">effects.phaser</span>
-                                    <span class="module-badge" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">requires librosa</span>
                                 </div>
                                 <p class="module-desc">Combined phaser and flanger effect with independent controls.</p>
                             </div>
@@ -549,13 +549,13 @@ output, sr = vocoder(
 
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.effects.phaser <span class="keyword">import</span> phaser_flanger_effect
+<pre><code><span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> phaser_flanger
 <span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
 
 audio, sr = sf.read(<span class="string">"guitar.wav"</span>)
 
 <span class="comment"># Classic phaser</span>
-phased = phaser_flanger_effect(
+phased = phaser_flanger(
     audio,
     sample_rate=sr,
     phaser_rate=<span class="number">0.8</span>,
@@ -566,7 +566,7 @@ phased = phaser_flanger_effect(
 )
 
 <span class="comment"># Jet flanger</span>
-flanged = phaser_flanger_effect(
+flanged = phaser_flanger(
     audio,
     sample_rate=sr,
     phaser_mix=<span class="number">0.0</span>,  <span class="comment"># Disable phaser</span>
@@ -582,23 +582,22 @@ sf.write(<span class="string">"phased.wav"</span>, phased, sr)</code></pre>
                     </div>
                 </section>
 
-                <!-- Super Delay -->
-                <section id="delay">
-                    <h2>Super Delay</h2>
+                <!-- Chorus -->
+                <section id="chorus">
+                    <h2>Chorus</h2>
                     <div class="module">
                         <div class="module-header">
                             <div>
                                 <div class="module-title">
-                                    <h3>SuperDelay</h3>
-                                    <span class="module-badge">effects.super_delay</span>
-                                    <span class="module-badge" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">requires librosa</span>
+                                    <h3>chorus</h3>
+                                    <span class="module-badge">effects.random_chorus</span>
                                 </div>
-                                <p class="module-desc">Feature-rich delay with pitch drift, flutter, saturation, and compression.</p>
+                                <p class="module-desc">Random chorus effect with multiple detuned voices for rich, spacious sound.</p>
                             </div>
                         </div>
                         <div class="module-content">
                             <div class="params-section">
-                                <h4>delay() Parameters</h4>
+                                <h4>Parameters</h4>
                                 <table class="params-table">
                                     <thead>
                                         <tr>
@@ -610,16 +609,114 @@ sf.write(<span class="string">"phased.wav"</span>, phased, sr)</code></pre>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><span class="param-name">input_file</span></td>
-                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-name">input_signal</span></td>
+                                            <td><span class="param-type">np.array</span></td>
                                             <td><span class="param-default">required</span></td>
-                                            <td>Input WAV path</td>
+                                            <td>Input audio signal</td>
                                         </tr>
                                         <tr>
-                                            <td><span class="param-name">output_file</span></td>
-                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-name">sample_rate</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">44100</span></td>
+                                            <td>Sample rate in Hz</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">mix</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.5</span></td>
+                                            <td>Wet/dry mix (0-1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">amount</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">1.0</span></td>
+                                            <td>Pitch modulation amount</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">speed</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.1</span></td>
+                                            <td>Modulation speed</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">n_clones</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">3</span></td>
+                                            <td>Number of chorus voices</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">delay</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0</span></td>
+                                            <td>Base delay in seconds</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> chorus
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+audio, sr = sf.read(<span class="string">"guitar.wav"</span>)
+
+<span class="comment"># Subtle chorus for warmth</span>
+warm = chorus(audio, sr, mix=<span class="number">0.4</span>, amount=<span class="number">1.0</span>, speed=<span class="number">0.1</span>, n_clones=<span class="number">2</span>)
+
+<span class="comment"># Lush 80s-style chorus</span>
+lush = chorus(
+    audio, sr,
+    mix=<span class="number">0.7</span>,
+    amount=<span class="number">3.0</span>,
+    speed=<span class="number">0.05</span>,
+    n_clones=<span class="number">4</span>,
+    delay=<span class="number">0.02</span>
+)
+
+sf.write(<span class="string">"chorus.wav"</span>, lush, sr)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Delay -->
+                <section id="delay">
+                    <h2>Delay</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>delay</h3>
+                                    <span class="module-badge">effects.super_delay</span>
+                                </div>
+                                <p class="module-desc">Feature-rich delay with digital and analog modes. Analog mode includes pitch drift, flutter, saturation, and compression.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Parameters</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">input_signal</span></td>
+                                            <td><span class="param-type">np.array</span></td>
                                             <td><span class="param-default">required</span></td>
-                                            <td>Output WAV path</td>
+                                            <td>Input audio signal</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">sample_rate</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">44100</span></td>
+                                            <td>Sample rate in Hz</td>
                                         </tr>
                                         <tr>
                                             <td><span class="param-name">delay_time</span></td>
@@ -640,46 +737,34 @@ sf.write(<span class="string">"phased.wav"</span>, phased, sr)</code></pre>
                                             <td>Wet/dry mix (0-1)</td>
                                         </tr>
                                         <tr>
+                                            <td><span class="param-name">mode</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">"digital"</span></td>
+                                            <td>"digital" (clean) or "analog" (tape-style)</td>
+                                        </tr>
+                                        <tr>
                                             <td><span class="param-name">lp_cutoff</span></td>
                                             <td><span class="param-type">float</span></td>
                                             <td><span class="param-default">3000</span></td>
-                                            <td>Low-pass filter cutoff Hz</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="param-name">flutter_base_rate</span></td>
-                                            <td><span class="param-type">float</span></td>
-                                            <td><span class="param-default">5.0</span></td>
-                                            <td>Flutter LFO rate Hz</td>
+                                            <td>Low-pass cutoff Hz (analog mode)</td>
                                         </tr>
                                         <tr>
                                             <td><span class="param-name">flutter_depth</span></td>
                                             <td><span class="param-type">float</span></td>
                                             <td><span class="param-default">0.005</span></td>
-                                            <td>Flutter modulation depth</td>
+                                            <td>Flutter modulation depth (analog mode)</td>
                                         </tr>
                                         <tr>
                                             <td><span class="param-name">pitch_drift_depth</span></td>
                                             <td><span class="param-type">float</span></td>
                                             <td><span class="param-default">0.1</span></td>
-                                            <td>Pitch drift amount</td>
+                                            <td>Pitch drift amount (analog mode)</td>
                                         </tr>
                                         <tr>
                                             <td><span class="param-name">drive</span></td>
                                             <td><span class="param-type">float</span></td>
                                             <td><span class="param-default">2.0</span></td>
-                                            <td>Saturation drive</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="param-name">threshold</span></td>
-                                            <td><span class="param-type">float</span></td>
-                                            <td><span class="param-default">0.7</span></td>
-                                            <td>Compressor threshold</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="param-name">ratio</span></td>
-                                            <td><span class="param-type">float</span></td>
-                                            <td><span class="param-default">4.0</span></td>
-                                            <td>Compression ratio</td>
+                                            <td>Saturation drive (analog mode)</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -687,32 +772,28 @@ sf.write(<span class="string">"phased.wav"</span>, phased, sr)</code></pre>
 
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.effects.super_delay <span class="keyword">import</span> SuperDelay
+<pre><code><span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> delay
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
 
-delay = SuperDelay()
+audio, sr = sf.read(<span class="string">"vocals.wav"</span>)
+
+<span class="comment"># Clean digital delay</span>
+digital = delay(audio, sr, delay_time=<span class="number">0.5</span>, feedback=<span class="number">0.5</span>, mode=<span class="string">"digital"</span>)
 
 <span class="comment"># Tape-style delay with wow/flutter</span>
-delay.delay(
-    input_file=<span class="string">"vocals.wav"</span>,
-    output_file=<span class="string">"tape_delay.wav"</span>,
+analog = delay(
+    audio, sr,
     delay_time=<span class="number">0.375</span>,  <span class="comment"># dotted eighth</span>
     feedback=<span class="number">0.6</span>,
+    mix=<span class="number">0.7</span>,
+    mode=<span class="string">"analog"</span>,
     lp_cutoff=<span class="number">2500</span>,
     flutter_depth=<span class="number">0.01</span>,
     pitch_drift_depth=<span class="number">0.15</span>,
     drive=<span class="number">3.0</span>
 )
 
-<span class="comment"># Clean digital delay</span>
-delay.delay(
-    input_file=<span class="string">"guitar.wav"</span>,
-    output_file=<span class="string">"clean_delay.wav"</span>,
-    delay_time=<span class="number">0.5</span>,
-    feedback=<span class="number">0.5</span>,
-    flutter_depth=<span class="number">0.0</span>,
-    pitch_drift_depth=<span class="number">0.0</span>,
-    drive=<span class="number">1.0</span>
-)</code></pre>
+sf.write(<span class="string">"tape_delay.wav"</span>, analog, sr)</code></pre>
                             </div>
                         </div>
                     </div>
@@ -720,14 +801,13 @@ delay.delay(
 
                 <!-- Glitch -->
                 <section id="glitch">
-                    <h2>Glitch Machine</h2>
+                    <h2>Glitch</h2>
                     <div class="module">
                         <div class="module-header">
                             <div>
                                 <div class="module-title">
-                                    <h3>glitch_machine</h3>
+                                    <h3>glitch</h3>
                                     <span class="module-badge">effects.glitch</span>
-                                    <span class="module-badge" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">requires librosa</span>
                                 </div>
                                 <p class="module-desc">Segment-based glitch processor with multiple random effects.</p>
                             </div>
@@ -746,16 +826,16 @@ delay.delay(
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><span class="param-name">input_file</span></td>
-                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-name">input_signal</span></td>
+                                            <td><span class="param-type">np.array</span></td>
                                             <td><span class="param-default">required</span></td>
-                                            <td>Input WAV path</td>
+                                            <td>Input audio signal</td>
                                         </tr>
                                         <tr>
-                                            <td><span class="param-name">output_file</span></td>
-                                            <td><span class="param-type">str</span></td>
-                                            <td><span class="param-default">required</span></td>
-                                            <td>Output WAV path</td>
+                                            <td><span class="param-name">sample_rate</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">44100</span></td>
+                                            <td>Sample rate in Hz</td>
                                         </tr>
                                         <tr>
                                             <td><span class="param-name">n_segments</span></td>
@@ -819,25 +899,18 @@ delay.delay(
 
                             <div class="code-section">
                                 <h4>Example Usage</h4>
-<pre><code><span class="keyword">from</span> audio_dsp.effects.glitch <span class="keyword">import</span> glitch_machine
+<pre><code><span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> glitch
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+audio, sr = sf.read(<span class="string">"drums.wav"</span>)
 
 <span class="comment"># Subtle glitching</span>
-glitch_machine(
-    input_file=<span class="string">"drums.wav"</span>,
-    output_file=<span class="string">"glitched_subtle.wav"</span>,
-    n_segments=<span class="number">32</span>,
-    intensity=<span class="number">0.3</span>,
-    loop_length=<span class="number">4.0</span>
-)
+glitched = glitch(audio, sr, n_segments=<span class="number">32</span>, intensity=<span class="number">0.3</span>, loop_length=<span class="number">4.0</span>)
 
 <span class="comment"># Extreme destruction</span>
-glitch_machine(
-    input_file=<span class="string">"vocals.wav"</span>,
-    output_file=<span class="string">"destroyed.wav"</span>,
-    n_segments=<span class="number">128</span>,
-    intensity=<span class="number">0.9</span>,
-    loop_length=<span class="number">2.0</span>
-)</code></pre>
+destroyed = glitch(audio, sr, n_segments=<span class="number">128</span>, intensity=<span class="number">0.9</span>, loop_length=<span class="number">2.0</span>)
+
+sf.write(<span class="string">"glitched.wav"</span>, glitched, sr)</code></pre>
                             </div>
                         </div>
                     </div>
@@ -1057,34 +1130,147 @@ sf.write(<span class="string">"pumping_bass.wav"</span>, pumped, sr)</code></pre
 
                 <!-- Compressors -->
                 <section id="compressors">
-                    <h2>Advanced Compressors</h2>
+                    <h2>Compressors</h2>
                     <div class="module">
                         <div class="module-header">
                             <div>
                                 <div class="module-title">
-                                    <h3>Specialized Compressors</h3>
-                                    <span class="module-badge">effects</span>
+                                    <h3>compress</h3>
+                                    <span class="module-badge">effects.super_clean_compressor</span>
                                 </div>
-                                <p class="module-desc">Advanced compression algorithms for creative dynamics processing.</p>
+                                <p class="module-desc">High-quality compressor with transparent and vintage modes.</p>
                             </div>
                         </div>
                         <div class="module-content">
-                            <div class="method-list">
-                                <div class="method-item">
-                                    <span class="method-name">spectral_flow_compressor</span>
-                                    <p class="method-desc">Spectral domain compression operating on frequency bins.</p>
-                                </div>
-                                <div class="method-item">
-                                    <span class="method-name">topological_dynamics_compressor</span>
-                                    <p class="method-desc">Advanced adaptive compression with topological analysis.</p>
-                                </div>
-                                <div class="method-item">
-                                    <span class="method-name">super_clean_compressor</span>
-                                    <p class="method-desc">Transparent dynamics control for mastering.</p>
-                                </div>
-                                <div class="method-item">
-                                    <span class="method-name">fractional_calculus_compressor</span>
-                                    <p class="method-desc">Fractional-order compression for unique dynamics curves.</p>
+                            <div class="params-section">
+                                <h4>Parameters</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Parameter</th>
+                                            <th>Type</th>
+                                            <th>Default</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="param-name">input_signal</span></td>
+                                            <td><span class="param-type">np.array</span></td>
+                                            <td><span class="param-default">required</span></td>
+                                            <td>Input audio signal</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">sample_rate</span></td>
+                                            <td><span class="param-type">int</span></td>
+                                            <td><span class="param-default">44100</span></td>
+                                            <td>Sample rate in Hz</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">mode</span></td>
+                                            <td><span class="param-type">str</span></td>
+                                            <td><span class="param-default">"transparent"</span></td>
+                                            <td>"transparent" or "vintage"</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">threshold</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">-20.0</span></td>
+                                            <td>Threshold in dB</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">ratio</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">4.0</span></td>
+                                            <td>Compression ratio (4.0 = 4:1)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">attack</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.01</span></td>
+                                            <td>Attack time in seconds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">release</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.1</span></td>
+                                            <td>Release time in seconds</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">knee_width</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">6.0</span></td>
+                                            <td>Soft knee width in dB</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">input_gain</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.0</span></td>
+                                            <td>Input gain in dB</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">output_gain</span></td>
+                                            <td><span class="param-type">float</span></td>
+                                            <td><span class="param-default">0.0</span></td>
+                                            <td>Output/makeup gain in dB</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="param-name">limit</span></td>
+                                            <td><span class="param-type">bool</span></td>
+                                            <td><span class="param-default">False</span></td>
+                                            <td>Hard limit at 0 dBFS</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Example Usage</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.effects <span class="keyword">import</span> compress
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+audio, sr = sf.read(<span class="string">"drums.wav"</span>)
+
+<span class="comment"># Transparent mastering compression</span>
+compressed = compress(
+    audio, sr,
+    mode=<span class="string">"transparent"</span>,
+    threshold=<span class="number">-18.0</span>,
+    ratio=<span class="number">3.0</span>,
+    attack=<span class="number">0.01</span>,
+    release=<span class="number">0.1</span>,
+    output_gain=<span class="number">3.0</span>
+)
+
+<span class="comment"># Vintage-style with saturation</span>
+vintage = compress(
+    audio, sr,
+    mode=<span class="string">"vintage"</span>,
+    threshold=<span class="number">-24.0</span>,
+    ratio=<span class="number">6.0</span>,
+    attack=<span class="number">0.005</span>,
+    release=<span class="number">0.05</span>,
+    output_gain=<span class="number">6.0</span>
+)
+
+sf.write(<span class="string">"compressed.wav"</span>, compressed, sr)</code></pre>
+                            </div>
+
+                            <div class="params-section">
+                                <h4>Other Specialized Compressors</h4>
+                                <div class="method-list">
+                                    <div class="method-item">
+                                        <span class="method-name">spectral_flow_compressor</span>
+                                        <p class="method-desc">Spectral domain compression operating on frequency bins.</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">topological_compressor</span>
+                                        <p class="method-desc">Advanced adaptive compression with topological analysis.</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">fractional_compressor</span>
+                                        <p class="method-desc">Fractional-order compression for unique dynamics curves.</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1096,14 +1282,15 @@ sf.write(<span class="string">"pumping_bass.wav"</span>, pumped, sr)</code></pre
                 <h4>On This Page</h4>
                 <ul>
                     <li><a href="#distortion">Distortion Suite</a></li>
-                    <li><a href="#filter">Resonant Filter</a></li>
+                    <li><a href="#filter">Filter</a></li>
                     <li><a href="#vocoder">Vocoder</a></li>
                     <li><a href="#phaser">Phaser/Flanger</a></li>
-                    <li><a href="#delay">Super Delay</a></li>
-                    <li><a href="#glitch">Glitch Machine</a></li>
+                    <li><a href="#chorus">Chorus</a></li>
+                    <li><a href="#delay">Delay</a></li>
+                    <li><a href="#glitch">Glitch</a></li>
+                    <li><a href="#compressors">Compressors</a></li>
                     <li><a href="#multiband">Multi-Band Saturation</a></li>
                     <li><a href="#negative">Negative Audio</a></li>
-                    <li><a href="#compressors">Compressors</a></li>
                 </ul>
             </aside>
         </div>

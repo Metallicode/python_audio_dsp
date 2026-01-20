@@ -40,12 +40,133 @@
                 </header>
 
                 <div class="quick-links">
+                    <a href="#unified" class="quick-link">Unified API</a>
                     <a href="#raga" class="quick-link">Raga Generator</a>
-                    <a href="#gol" class="quick-link">Game of Life</a>
-                    <a href="#text" class="quick-link">Text Sequencer</a>
-                    <a href="#nonlinear" class="quick-link">Non-Linear</a>
+                    <a href="#tree" class="quick-link">Tree Composer</a>
+                    <a href="#chords" class="quick-link">Chord Progressions</a>
                     <a href="#melody" class="quick-link">Melody Choice</a>
+                    <a href="#nonlinear" class="quick-link">Non-Linear</a>
+                    <a href="#text" class="quick-link">Text Sequencer</a>
+                    <a href="#gol" class="quick-link">Game of Life</a>
                 </div>
+
+                <!-- Unified API -->
+                <section id="unified">
+                    <h2>Unified Sequencer API</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Common Interface</h3>
+                                    <span class="module-badge">sequencer</span>
+                                </div>
+                                <p class="module-desc">All sequencers share a unified API with common base classes, sample management, and pattern-based generation.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Core Components</h4>
+                                <div class="method-list">
+                                    <div class="method-item">
+                                        <span class="method-name">BaseSequencer</span>
+                                        <p class="method-desc">Abstract base class with <code>generate(duration)</code>, <code>export(filepath)</code>, and common properties (sample_rate, bpm).</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">PatternSequencer</span>
+                                        <p class="method-desc">Pattern-based sequencing with sample triggering. Supports timing modifiers (*2 double, /2 half speed).</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">LiquidSequencer</span>
+                                        <p class="method-desc">Non-linear timing with swing and jitter for organic, humanized rhythms.</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">GenerativeSequencer</span>
+                                        <p class="method-desc">Base for generative sequencers (raga, tree, melody) with built-in sine wave synthesis.</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">SampleManager</span>
+                                        <p class="method-desc">Unified sample loading from files OR numpy arrays. Automatic resampling to target rate.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>PatternSequencer Example</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer <span class="keyword">import</span> PatternSequencer, SampleManager
+<span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> SubtractiveSynth
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Create samples from synth output</span>
+synth = SubtractiveSynth()
+kick = synth.synthesize(freq=<span class="number">60</span>, duration=<span class="number">0.1</span>)
+snare = synth.synthesize(freq=<span class="number">200</span>, duration=<span class="number">0.1</span>)
+
+<span class="comment"># Create pattern sequencer</span>
+seq = PatternSequencer(bpm=<span class="number">120</span>)
+
+<span class="comment"># Add samples - accepts numpy arrays OR file paths</span>
+seq.add_sample(<span class="string">"kick"</span>, kick)           <span class="comment"># numpy array</span>
+seq.add_sample(<span class="string">"snare"</span>, snare)         <span class="comment"># numpy array</span>
+seq.add_sample(<span class="string">"hihat"</span>, <span class="string">"hihat.wav"</span>)  <span class="comment"># file path</span>
+
+<span class="comment"># Define patterns (1=trigger, 0=rest)</span>
+patterns = {
+    <span class="string">"kick"</span>:  <span class="string">"1000100010001000"</span>,
+    <span class="string">"snare"</span>: <span class="string">"0000100000001000"</span>,
+    <span class="string">"hihat"</span>: <span class="string">"1010101010101010"</span>
+}
+
+<span class="comment"># Generate audio</span>
+audio = seq.generate_from_patterns(patterns, duration=<span class="number">4.0</span>)
+
+<span class="comment"># Export to file</span>
+seq.export(<span class="string">"beat.wav"</span>, duration=<span class="number">4.0</span>)</code></pre>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>LiquidSequencer Example (Non-Linear Timing)</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer <span class="keyword">import</span> LiquidSequencer
+
+<span class="comment"># Create sequencer with swing and jitter</span>
+seq = LiquidSequencer(bpm=<span class="number">100</span>, swing=<span class="number">0.15</span>, jitter=<span class="number">0.02</span>)
+
+<span class="comment"># Load default drum samples</span>
+seq.sample_manager.load_directory(<span class="string">"audio_dsp/sequencer/samples/drums"</span>)
+
+<span class="comment"># Add samples from manager</span>
+seq.add_sample(<span class="string">"kick"</span>, seq.sample_manager.get(<span class="string">"kick"</span>))
+seq.add_sample(<span class="string">"snare"</span>, seq.sample_manager.get(<span class="string">"snare"</span>))
+
+<span class="comment"># Generate with humanized timing</span>
+patterns = {<span class="string">"kick"</span>: <span class="string">"1010"</span>, <span class="string">"snare"</span>: <span class="string">"0101"</span>}
+audio = seq.generate_from_patterns(patterns, duration=<span class="number">2.0</span>)</code></pre>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>SampleManager - Unified Sample Loading</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer <span class="keyword">import</span> SampleManager, get_default_samples_dir
+
+<span class="comment"># Create manager with target sample rate</span>
+sm = SampleManager(sample_rate=<span class="number">44100</span>)
+
+<span class="comment"># Load from file</span>
+sm.load(<span class="string">"my_sample.wav"</span>, name=<span class="string">"sample1"</span>)
+
+<span class="comment"># Add numpy array (e.g., from synth)</span>
+sm.add(<span class="string">"synth_tone"</span>, synth_output_array, sr=<span class="number">44100</span>)
+
+<span class="comment"># Load entire directory</span>
+sm.load_directory(<span class="string">"samples/"</span>, pattern=<span class="string">"*.wav"</span>)
+
+<span class="comment"># Get sample (auto-resampled to manager's rate)</span>
+audio = sm.get(<span class="string">"sample1"</span>)
+
+<span class="comment"># List all loaded samples</span>
+<span class="keyword">print</span>(sm.list_samples())</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
                 <!-- Raga Generator -->
                 <section id="raga">
@@ -200,7 +321,33 @@
                             </div>
 
                             <div class="code-section">
-                                <h4>Example Usage</h4>
+                                <h4>RagaSequencer (Unified API)</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.raga_generator <span class="keyword">import</span> RagaSequencer
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+<span class="comment"># Create raga sequencer</span>
+seq = RagaSequencer(bpm=<span class="number">90</span>, root_frequency=<span class="number">220.0</span>)
+
+<span class="comment"># Choose raga based on time of day</span>
+raga = seq.choose_raga()  <span class="comment"># or specify hour: seq.choose_raga(hour=12)</span>
+<span class="keyword">print</span>(f<span class="string">"Playing {raga['name']} with intervals {raga['intervals']}"</span>)
+
+<span class="comment"># Generate a raga phrase</span>
+audio = seq.generate_raga_phrase(raga, duration=<span class="number">30.0</span>)
+
+<span class="comment"># Or use generate() for auto time-based raga selection</span>
+audio = seq.generate(duration=<span class="number">60.0</span>)
+
+<span class="comment"># Export directly</span>
+seq.export(<span class="string">"raga_music.wav"</span>, duration=<span class="number">60.0</span>)
+
+<span class="comment"># Generate fractal rhythm separately</span>
+rhythm = seq.generate_fractal_rhythm(depth=<span class="number">4</span>, randomness=<span class="number">0.15</span>)
+<span class="keyword">print</span>(f<span class="string">"Rhythm pattern: {rhythm[:16]}..."</span>)</code></pre>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Legacy API</h4>
 <pre><code><span class="keyword">from</span> audio_dsp.sequencer.raga_generator <span class="keyword">import</span> (
     choose_raga,
     generate_fractal_rhythm,
@@ -243,6 +390,195 @@ melody_audio = []
     melody_audio.append(note)
 
 sf.write(<span class="string">"raga_melody.wav"</span>, np.concatenate(melody_audio), <span class="number">44100</span>)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tree Composer -->
+                <section id="tree">
+                    <h2>Tree Composer</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Rule-Based Tree Composer</h3>
+                                    <span class="module-badge">sequencer.tree_composer</span>
+                                </div>
+                                <p class="module-desc">Generate music by traversing tree structures where nodes represent frequency/duration pairs. Supports depth-first and breadth-first traversals.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <details open>
+                                <summary>Tree Structure</summary>
+                                <div>
+                                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">The tree composer builds a hierarchical structure where:</p>
+                                    <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1rem;">
+                                        <li><strong>Root node</strong> = Base frequency and duration</li>
+                                        <li><strong>Child nodes</strong> = Frequency variations based on angle spread</li>
+                                        <li><strong>Depth</strong> = Shorter durations at deeper levels</li>
+                                        <li><strong>Traversal</strong> = Order of note playback</li>
+                                    </ul>
+                                </div>
+                            </details>
+
+                            <details>
+                                <summary>Parameters</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Parameter</th>
+                                                <th>Type</th>
+                                                <th>Default</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">levels</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td><span class="param-default">3</span></td>
+                                                <td>Number of tree levels</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">n_splits</span></td>
+                                                <td><span class="param-type">int</span></td>
+                                                <td><span class="param-default">3</span></td>
+                                                <td>Branches per node</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">angle</span></td>
+                                                <td><span class="param-type">float</span></td>
+                                                <td><span class="param-default">30.0</span></td>
+                                                <td>Angle spread in degrees (affects pitch)</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">traversal</span></td>
+                                                <td><span class="param-type">str</span></td>
+                                                <td><span class="param-default">'depth_first'</span></td>
+                                                <td>'depth_first' or 'breadth_first'</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
+                            <div class="code-section">
+                                <h4>TreeSequencer (Unified API)</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.tree_composer <span class="keyword">import</span> TreeSequencer
+
+<span class="comment"># Create tree sequencer</span>
+seq = TreeSequencer(bpm=<span class="number">120</span>, root_freq=<span class="number">261.63</span>)  <span class="comment"># C4</span>
+
+<span class="comment"># Generate tree composition</span>
+audio = seq.generate_tree_composition(
+    levels=<span class="number">4</span>,
+    n_splits=<span class="number">3</span>,
+    angle=<span class="number">30.0</span>,
+    traversal=<span class="string">'depth_first'</span>,
+    speed_factor=<span class="number">0.5</span>
+)
+
+<span class="comment"># Export</span>
+seq.export(<span class="string">"tree_music.wav"</span>, duration=<span class="number">10.0</span>)
+
+<span class="comment"># Or build and traverse manually</span>
+root, nodes = seq.build_tree(n_splits=<span class="number">2</span>, levels=<span class="number">3</span>)
+path = seq.traverse_tree(method=<span class="string">'breadth_first'</span>)
+audio = seq.generate_from_path(path, duration=<span class="number">5.0</span>)</code></pre>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Legacy API</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.tree_composer <span class="keyword">import</span> (
+    build_tree,
+    traverse_tree,
+    generate_audio_from_tree,
+    rule_based_tree_composer
+)
+
+<span class="comment"># Quick generation</span>
+audio = rule_based_tree_composer(
+    root_freq=<span class="number">261.63</span>,
+    levels=<span class="number">4</span>,
+    n_splits=<span class="number">3</span>,
+    traversal=<span class="string">'depth_first'</span>,
+    speed_factor=<span class="number">0.5</span>,
+    visualize=<span class="keyword">True</span>  <span class="comment"># Show tree structure</span>
+)
+
+<span class="comment"># Or step by step</span>
+root, nodes = build_tree(root_freq=<span class="number">261.63</span>, levels=<span class="number">3</span>)
+path = traverse_tree(root, method=<span class="string">'depth_first'</span>)
+audio, sr = generate_audio_from_tree(path)</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chord Progressions -->
+                <section id="chords">
+                    <h2>Chord Progressions</h2>
+                    <div class="module">
+                        <div class="module-header">
+                            <div>
+                                <div class="module-title">
+                                    <h3>Microtonal Chord Progressions</h3>
+                                    <span class="module-badge">sequencer.stepping_chord_progressions</span>
+                                </div>
+                                <p class="module-desc">Generate chord progressions using microtonal scales (24-TET quarter tones, etc.) with stepping patterns based on numeric sequences.</p>
+                            </div>
+                        </div>
+                        <div class="module-content">
+                            <div class="params-section">
+                                <h4>Available Microtonal Modes</h4>
+                                <table class="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mode</th>
+                                            <th>Steps Pattern</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td><span class="param-name">micro_ionian</span></td><td>[4, 3, 2, 4, 4, 4, 2]</td></tr>
+                                        <tr><td><span class="param-name">micro_dorian</span></td><td>[4, 2, 4, 4, 4, 2, 4]</td></tr>
+                                        <tr><td><span class="param-name">micro_phrygian</span></td><td>[2, 4, 4, 4, 2, 4, 4]</td></tr>
+                                        <tr><td><span class="param-name">phrygian_dominant</span></td><td>[2, 6, 2, 4, 2, 4, 4]</td></tr>
+                                        <tr><td><span class="param-name">quarter_tone</span></td><td>[3, 3, 3, 3, 3, 3, 3, 3]</td></tr>
+                                        <tr><td><span class="param-name">micro_blues</span></td><td>[6, 4, 2, 2, 6, 4]</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>ChordProgressionSequencer (Unified API)</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.stepping_chord_progressions <span class="keyword">import</span> ChordProgressionSequencer
+
+<span class="comment"># Create sequencer with 24-TET (quarter tones)</span>
+seq = ChordProgressionSequencer(
+    bpm=<span class="number">90</span>,
+    root_note=<span class="string">'A'</span>,
+    root_octave=<span class="number">3</span>,
+    steps_per_octave=<span class="number">24</span>  <span class="comment"># 24-TET</span>
+)
+
+<span class="comment"># Set microtonal mode</span>
+seq.set_mode(<span class="string">'micro_dorian'</span>)
+
+<span class="comment"># Generate stepped progression</span>
+audio = seq.generate_stepped_progression(
+    start_num=<span class="number">1</span>,
+    step_sizes=[<span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>],  <span class="comment"># Cycle through these steps</span>
+    num_steps=<span class="number">16</span>,
+    notes_per_chord=<span class="number">4</span>  <span class="comment"># 4-note chords</span>
+)
+
+<span class="comment"># Export</span>
+seq.export(<span class="string">"microtonal_chords.wav"</span>, duration=<span class="number">16.0</span>)
+
+<span class="comment"># Use custom scale steps</span>
+seq.set_mode(custom_steps=[<span class="number">4</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">4</span>])</code></pre>
                             </div>
                         </div>
                     </div>
@@ -376,25 +712,73 @@ sequencer(
                         <div class="module-header">
                             <div>
                                 <div class="module-title">
-                                    <h3>Chaotic Sequencing</h3>
+                                    <h3>Liquid Timing Sequencer</h3>
                                     <span class="module-badge">sequencer.non_linear</span>
                                 </div>
-                                <p class="module-desc">Generate sequences using strange attractors and chaotic systems.</p>
+                                <p class="module-desc">Generate sequences with non-linear "liquid" timing, swing, and jitter for organic, humanized rhythms.</p>
                             </div>
                         </div>
                         <div class="module-content">
                             <div class="params-section">
                                 <h4>Concept</h4>
                                 <p style="color: var(--text-secondary);">
-                                    Non-linear sequencing uses mathematical chaos (Lorenz attractor, logistic map, etc.)
-                                    to generate unpredictable but structured musical patterns. The chaotic systems produce
-                                    values that are deterministic but highly sensitive to initial conditions, creating
-                                    organic-feeling sequences.
+                                    Non-linear sequencing introduces controlled randomness and timing variations
+                                    to create organic-feeling sequences. The "liquid" timing applies swing and jitter
+                                    to create grooves that sound more human and less robotic.
                                 </p>
                             </div>
 
+                            <details>
+                                <summary>Pattern Notation</summary>
+                                <div>
+                                    <table class="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Symbol</th>
+                                                <th>Meaning</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td><span class="param-name">K</span></td><td>Kick drum</td></tr>
+                                            <tr><td><span class="param-name">S</span></td><td>Snare drum</td></tr>
+                                            <tr><td><span class="param-name">H</span></td><td>Hi-hat</td></tr>
+                                            <tr><td><span class="param-name">-</span></td><td>Extend previous note</td></tr>
+                                            <tr><td><span class="param-name">.</span></td><td>Rest</td></tr>
+                                            <tr><td><span class="param-name">|n</span></td><td>Loop n times</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+
                             <div class="code-section">
-                                <h4>Example Usage</h4>
+                                <h4>NonLinearDrumSequencer (Unified API)</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.non_linear.non_linear_seq <span class="keyword">import</span> NonLinearDrumSequencer
+
+<span class="comment"># Create sequencer with swing and jitter</span>
+seq = NonLinearDrumSequencer(bpm=<span class="number">120</span>, swing=<span class="number">0.15</span>, jitter=<span class="number">0.02</span>)
+
+<span class="comment"># Load default drum samples from directory</span>
+seq.load_drum_samples(<span class="string">"samples/"</span>)
+
+<span class="comment"># Or add samples manually</span>
+<span class="keyword">from</span> audio_dsp.synth <span class="keyword">import</span> DrumSynth
+drums = DrumSynth()
+seq.add_sample(<span class="string">"kick"</span>, drums.kick())
+seq.add_sample(<span class="string">"snare"</span>, drums.snare())
+seq.add_sample(<span class="string">"hihat"</span>, drums.hihat())
+
+<span class="comment"># Generate with liquid timing</span>
+audio = seq.generate_liquid_drums(
+    pattern_str=<span class="string">"K---S---K-S-S---|4"</span>,  <span class="comment"># Pattern with 4 loops</span>
+    loop_length=<span class="number">2.0</span>  <span class="comment"># 2 seconds per loop</span>
+)
+
+<span class="comment"># Export</span>
+seq.export(<span class="string">"liquid_drums.wav"</span>, duration=<span class="number">8.0</span>)</code></pre>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Legacy API</h4>
 <pre><code><span class="keyword">from</span> audio_dsp.sequencer.non_linear.non_linear_seq <span class="keyword">import</span> (
     load_samples,
     parse_pattern,
@@ -405,8 +789,7 @@ sequencer(
 <span class="comment"># Load drum samples (kick.wav, snare.wav, hihat.wav)</span>
 samples = load_samples(<span class="string">"samples/"</span>)
 
-<span class="comment"># Parse pattern string (K=kick, S=snare, H=hihat, .=rest)</span>
-<span class="comment"># Use - to extend notes, | for loop count</span>
+<span class="comment"># Parse pattern string</span>
 pattern = <span class="string">"K.S-HK.S-H--.S.H--|4"</span>
 events, loops = parse_pattern(pattern)
 
@@ -433,15 +816,61 @@ output = generate_pattern(
                         <div class="module-header">
                             <div>
                                 <div class="module-title">
-                                    <h3>Algorithmic Melody</h3>
+                                    <h3>Melodic Composition</h3>
                                     <span class="module-badge">sequencer.melody_choice</span>
                                 </div>
-                                <p class="module-desc">Probabilistic and rule-based melody generation algorithms.</p>
+                                <p class="module-desc">Melody development using compositional techniques like mirroring, inversion, and repetition. Includes automatic counterpoint generation.</p>
                             </div>
                         </div>
                         <div class="module-content">
+                            <div class="params-section">
+                                <h4>Development Techniques</h4>
+                                <div class="method-list">
+                                    <div class="method-item">
+                                        <span class="method-name">horizontal_mirror</span>
+                                        <p class="method-desc">Retrograde - reverse the melody</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">vertical_flip</span>
+                                        <p class="method-desc">Inversion - flip around pivot frequency</p>
+                                    </div>
+                                    <div class="method-item">
+                                        <span class="method-name">repeat_segment</span>
+                                        <p class="method-desc">Repeat a random segment of the melody</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="code-section">
-                                <h4>Example Usage</h4>
+                                <h4>MelodySequencer (Unified API)</h4>
+<pre><code><span class="keyword">from</span> audio_dsp.sequencer.melody_choice <span class="keyword">import</span> MelodySequencer
+<span class="keyword">import</span> soundfile <span class="keyword">as</span> sf
+
+<span class="comment"># Create melody sequencer</span>
+seq = MelodySequencer(bpm=<span class="number">100</span>, base_freq=<span class="number">261.63</span>)  <span class="comment"># C4</span>
+
+<span class="comment"># Generate random melody</span>
+melody = seq.generate_random_melody(length=<span class="number">8</span>)
+
+<span class="comment"># Develop melody to target length using compositional techniques</span>
+developed = seq.develop_melody(melody, target_bars=<span class="number">16</span>)
+
+<span class="comment"># Generate counterpoint voice</span>
+counterpoint = seq.generate_counterpoint(developed, voice_shift=<span class="number">1</span>)
+
+<span class="comment"># Render single melody to audio</span>
+audio = seq.render_melody(developed)
+
+<span class="comment"># Render multiple voices together</span>
+audio = seq.render_voices([developed, counterpoint])
+
+<span class="comment"># Or use generate() for automatic composition</span>
+audio = seq.generate(duration=<span class="number">30.0</span>)
+seq.export(<span class="string">"melody.wav"</span>, duration=<span class="number">30.0</span>)</code></pre>
+                            </div>
+
+                            <div class="code-section">
+                                <h4>Legacy API</h4>
 <pre><code><span class="keyword">from</span> audio_dsp.sequencer.melody_choice <span class="keyword">import</span> develop_melody, generate_counterpoint
 
 <span class="comment"># Base melody as (frequency, duration) tuples</span>
@@ -471,11 +900,14 @@ voice3 = generate_counterpoint(developed, voice_num=-<span class="number">1</spa
             <aside class="toc">
                 <h4>On This Page</h4>
                 <ul>
+                    <li><a href="#unified">Unified API</a></li>
                     <li><a href="#raga">Raga Generator</a></li>
-                    <li><a href="#gol">Game of Life</a></li>
-                    <li><a href="#text">Text Sequencer</a></li>
-                    <li><a href="#nonlinear">Non-Linear</a></li>
+                    <li><a href="#tree">Tree Composer</a></li>
+                    <li><a href="#chords">Chord Progressions</a></li>
                     <li><a href="#melody">Melody Choice</a></li>
+                    <li><a href="#nonlinear">Non-Linear</a></li>
+                    <li><a href="#text">Text Sequencer</a></li>
+                    <li><a href="#gol">Game of Life</a></li>
                 </ul>
             </aside>
         </div>

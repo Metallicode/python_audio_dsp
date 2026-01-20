@@ -1,12 +1,39 @@
 """
 Music sequencing and algorithmic composition modules.
 
-Import specific modules as needed:
+This module provides a unified API for pattern-based and generative sequencers.
+
+Unified API (recommended):
+    from audio_dsp.sequencer import PatternSequencer, SampleManager
+    from audio_dsp.sequencer import BaseSequencer, GenerativeSequencer
+
+Legacy API (for backwards compatibility):
     from audio_dsp.sequencer import play_music_with_fractal_rhythm
     from audio_dsp.sequencer import rule_based_tree_composer
+
+Example usage:
+    >>> from audio_dsp.sequencer import PatternSequencer
+    >>> seq = PatternSequencer(bpm=120)
+    >>> seq.add_sample("kick", "samples/drums/kick.wav")
+    >>> seq.add_sample("snare", synth.synthesize(200, 0.1))  # numpy array
+    >>> patterns = {"kick": "1000100010001000", "snare": "0000100000001000"}
+    >>> audio = seq.generate_from_patterns(patterns, duration=4.0)
 """
 
 __all__ = []
+
+# Core unified API (always available - no optional dependencies)
+try:
+    from .base import BaseSequencer, PatternBasedSequencer, GenerativeSequencer
+    from .sample_manager import SampleManager, ClusterSampleManager, get_default_samples_dir
+    from .pattern_sequencer import PatternSequencer, LiquidSequencer
+    __all__.extend([
+        "BaseSequencer", "PatternBasedSequencer", "GenerativeSequencer",
+        "SampleManager", "ClusterSampleManager", "get_default_samples_dir",
+        "PatternSequencer", "LiquidSequencer"
+    ])
+except (ImportError, Exception):
+    pass
 
 # Raga generator (requires simpleaudio)
 try:

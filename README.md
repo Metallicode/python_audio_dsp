@@ -35,21 +35,31 @@ pip install audio-dsp[audio]   # Extended audio processing (librosa, pydub)
 - **DialupSynth** - Modem/dial-up sound synthesis
 
 ### Effects (`audio_dsp.effects`)
-- **Dynamics**: Compressors, multi-band saturation, negative audio
-- **Filters**: Low-pass, band-pass, high-pass filters
-- **Modulation**: Phaser, chorus, pitch drift, pitch flutter
-- **Time-based**: Delay, convolution reverb, time slice
-- **Spectral**: Frequency splicer, melt spectrum, vocoder, spectral quantization
-- **Character**: Distortion, lo-fi, glitch, tape saturation
-- **Specialized**: Auto-tune, sitar sympathetic resonance
+All effects follow a unified API: `effect(signal, sample_rate, **params) → numpy.ndarray`
+
+- **Dynamics**: `compress`, multi-band saturation, sidechain compressor
+- **Filters**: `filter` (lowpass, bandpass)
+- **Modulation**: `phaser_flanger`, `chorus`, `flutter`, pitch drift
+- **Time-based**: `delay`, `reverb` (convolution), time slice
+- **Spectral**: Frequency splicer, melt spectrum, `vocoder`, spectral quantization
+- **Character**: Distortion (19 types), `lofi`, `glitch`, tape saturation
+- **Specialized**: `autotune`, sitar sympathetic resonance, `variable_quantizer`
 
 ### Sequencers (`audio_dsp.sequencer`)
-- Raga generator with Indian classical music scales
-- Matrix and tree-based algorithmic composers
-- Game of Life sequencers
-- Text-based sequencing with sample clustering
-- Chord progression generators
-- Microtonal support
+
+**Unified API** - All sequencers share a common interface:
+- `BaseSequencer` - Base class with `generate()`, `export()` methods
+- `PatternSequencer` - Pattern-based sequencing with samples
+- `LiquidSequencer` - Non-linear timing with swing/jitter
+- `SampleManager` - Load samples from files or numpy arrays
+
+**Specialized Sequencers:**
+- `RagaSequencer` - Indian classical music with time-of-day raga selection
+- `TreeSequencer` - Tree traversal-based algorithmic composition
+- `ChordProgressionSequencer` - Microtonal chord progressions (24-TET, etc.)
+- `MelodySequencer` - Melody development with counterpoint generation
+- Game of Life sequencers with video output
+- Matrix composer for linear algebra sonification
 
 ### MIDI (`audio_dsp.midi`)
 - Polyrhythmic MIDI generation
@@ -98,18 +108,57 @@ sf.write("output.wav", audio, 44100)
 ```
 
 ```python
-from audio_dsp.utils import load_audio, save_audio
-from audio_dsp.effects import vocoder
+from audio_dsp.utils import load_audio
+from audio_dsp.utils import wav_io
+from audio_dsp.effects import filter, delay, reverb, compress
 
-# Load audio (accepts file paths or numpy arrays)
-sr, carrier = load_audio("carrier.wav")
-sr, modulator = load_audio("modulator.wav")
+# Load audio
+sr, audio = load_audio("input.wav", mono=True)
 
-# Apply vocoder effect
-output, sr = vocoder(carrier, modulator, sr, n_filters=16)
+# Chain effects - all work on numpy arrays
+audio = filter(audio, sr, cutoff=1000, filter_type="lowpass")
+audio = delay(audio, sr, delay_time=0.25, feedback=0.5, mode="analog")
+audio = reverb(audio, "impulse.wav", sr, wet_mix=0.3)
+audio = compress(audio, sr, threshold=-20, ratio=4.0)
 
 # Save output
-save_audio("output.wav", output, sr)
+wav_io.write("output.wav", sr, audio.astype('float32'))
+```
+
+```python
+from audio_dsp.sequencer import PatternSequencer, SampleManager
+from audio_dsp.synth import SubtractiveSynth
+import numpy as np
+
+# Create samples from synth output
+synth = SubtractiveSynth()
+kick = synth.synthesize(freq=60, duration=0.1)
+snare = synth.synthesize(freq=200, duration=0.1)
+
+# Create pattern sequencer
+seq = PatternSequencer(bpm=120)
+seq.add_sample("kick", kick)    # numpy array
+seq.add_sample("snare", snare)
+seq.add_sample("hihat", "samples/hihat.wav")  # or file path
+
+# Generate from patterns
+patterns = {
+    "kick": "1000100010001000",
+    "snare": "0000100000001000",
+    "hihat": "1010101010101010"
+}
+audio = seq.generate_from_patterns(patterns, duration=4.0)
+```
+
+```python
+from audio_dsp.sequencer import RagaSequencer
+
+# Generate raga-based music appropriate for time of day
+seq = RagaSequencer(bpm=90, root_frequency=220.0)
+raga = seq.choose_raga()  # Selects based on current hour
+print(f"Playing {raga['name']}")
+
+audio = seq.generate_raga_phrase(raga, duration=30.0)
 ```
 
 ## License
